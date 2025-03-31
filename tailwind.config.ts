@@ -5,12 +5,20 @@ export default {
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        poppins: ["Poppins", "sans-serif"],
+        roboto: ["Roboto", "sans-serif"],
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        lemonYellow: "hsl(var(--lemon-yellow))",
+        lightRed: "hsl(var(--light-red))",
+        softGrey: "hsl(var(--soft-grey))",
+        darkGrey: "hsl(var(--dark-grey))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
