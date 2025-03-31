@@ -11,10 +11,14 @@ import { ApplicationTable } from "@/components/dashboard/application-table";
 
 export default function CollegeDashboard() {
   const { user } = useAuth();
-
-  // Get applications for the college
+  
+  // Get status filter from URL if any
+  const params = new URLSearchParams(window.location.search);
+  const statusFilter = params.get('status') as ApplicationStatus || ApplicationStatus.PENDING;
+  
+  // Get applications for the college based on status filter
   const { data: applications, isLoading, error } = useQuery<Application[]>({
-    queryKey: ["/api/applications", { status: ApplicationStatus.PENDING }],
+    queryKey: ["/api/applications", { status: statusFilter }],
   });
 
   // Get all applications for the college (for statistics)

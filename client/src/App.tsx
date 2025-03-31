@@ -11,6 +11,7 @@ import StudentDashboard from "@/pages/student/dashboard";
 import StudentApply from "@/pages/student/apply";
 import StudentTrack from "@/pages/student/track";
 import StudentPayment from "@/pages/student/payment";
+import StudentDownload from "@/pages/student/download";
 import CollegeDashboard from "@/pages/college/dashboard";
 import CollegeVerify from "@/pages/college/verify";
 import DepotDashboard from "@/pages/depot/dashboard";
@@ -40,6 +41,7 @@ function Router() {
       <ProtectedRoute path="/student/apply" component={StudentApply} userType={UserType.STUDENT} />
       <ProtectedRoute path="/student/track/:id" component={StudentTrack} userType={UserType.STUDENT} />
       <ProtectedRoute path="/student/payment/:id" component={StudentPayment} userType={UserType.STUDENT} />
+      <ProtectedRoute path="/student/download/:id" component={StudentDownload} userType={UserType.STUDENT} />
       
       {/* College Routes */}
       <ProtectedRoute path="/college/dashboard" component={CollegeDashboard} userType={UserType.COLLEGE} />

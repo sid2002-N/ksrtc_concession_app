@@ -37,9 +37,13 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
                 </Link>
               )}
               
-              <Button variant="outline" className="w-full">
-                Download Application
-              </Button>
+              {application && (
+                <Link href={`/student/download/${application.id}`}>
+                  <Button variant="outline" className="w-full">
+                    Download Application
+                  </Button>
+                </Link>
+              )}
               
               <Link href="/contact">
                 <Button variant="outline" className="w-full">
@@ -57,13 +61,17 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
                 </Button>
               </Link>
               
-              <Button variant="outline" className="w-full">
-                Verified Applications
-              </Button>
+              <Link href="/college/dashboard?status=college_verified">
+                <Button variant="outline" className="w-full">
+                  Verified Applications
+                </Button>
+              </Link>
               
-              <Button variant="outline" className="w-full">
-                Rejected Applications
-              </Button>
+              <Link href="/college/dashboard?status=college_rejected">
+                <Button variant="outline" className="w-full">
+                  Rejected Applications
+                </Button>
+              </Link>
               
               <Link href="/contact">
                 <Button variant="outline" className="w-full">
@@ -81,17 +89,23 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
                 </Button>
               </Link>
               
-              <Button variant="outline" className="w-full">
-                Payment Verifications
-              </Button>
+              <Link href="/depot/dashboard?tab=payment">
+                <Button variant="outline" className="w-full">
+                  Payment Verifications
+                </Button>
+              </Link>
               
-              <Button variant="outline" className="w-full">
-                Issue Concessions
-              </Button>
+              <Link href="/depot/dashboard?tab=issuance">
+                <Button variant="outline" className="w-full">
+                  Issue Concessions
+                </Button>
+              </Link>
               
-              <Button variant="outline" className="w-full">
-                Approved Applications
-              </Button>
+              <Link href="/depot/dashboard?tab=issued">
+                <Button variant="outline" className="w-full">
+                  Approved Applications
+                </Button>
+              </Link>
               
               <Link href="/contact">
                 <Button variant="outline" className="w-full">

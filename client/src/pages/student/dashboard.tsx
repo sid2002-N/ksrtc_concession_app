@@ -110,14 +110,22 @@ export default function StudentDashboard() {
                                   app.status.includes('rejected') ? 'bg-red-100 text-red-800' : 
                                   'bg-yellow-100 text-yellow-800'
                                 }`}>
-                                  {app.status.replace('_', ' ').toUpperCase()}
+                                  {app.status.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
                                 </p>
                               </div>
                             </div>
-                            <div className="ml-2 flex-shrink-0 flex">
+                            <div className="ml-2 flex-shrink-0 flex space-x-4">
                               <p className="text-sm text-gray-500">
                                 Applied: {new Date(app.applicationDate).toLocaleDateString()}
                               </p>
+                              {app.status === 'issued' && (
+                                <Link 
+                                  href={`/student/download/${app.id}`}
+                                  className="text-sm text-primary-600 hover:text-primary-800 font-medium"
+                                >
+                                  Download Pass
+                                </Link>
+                              )}
                             </div>
                           </div>
                           <div className="mt-2 sm:flex sm:justify-between">

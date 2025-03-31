@@ -13,7 +13,12 @@ import { useState } from "react";
 
 export default function DepotDashboard() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState("pending");
+  
+  // Get tab parameter from URL if any
+  const params = new URLSearchParams(window.location.search);
+  const tabParam = params.get('tab') || "pending";
+  
+  const [activeTab, setActiveTab] = useState(tabParam);
 
   // Get applications for approval (college verified)
   const { data: pendingApplications, isLoading: isLoadingPending, error: pendingError } = useQuery<Application[]>({
@@ -28,6 +33,11 @@ export default function DepotDashboard() {
   // Get applications for issuance
   const { data: issuanceApplications, isLoading: isLoadingIssuance, error: issuanceError } = useQuery<Application[]>({
     queryKey: ["/api/applications", { status: ApplicationStatus.PAYMENT_VERIFIED }],
+  });
+  
+  // Get issued applications
+  const { data: issuedApplications, isLoading: isLoadingIssued, error: issuedError } = useQuery<Application[]>({
+    queryKey: ["/api/applications", { status: ApplicationStatus.ISSUED }],
   });
 
   // Get all applications for the depot (for statistics)
@@ -103,6 +113,7 @@ export default function DepotDashboard() {
                   <TabsTrigger value="pending">Pending Approvals</TabsTrigger>
                   <TabsTrigger value="payment">Payment Verification</TabsTrigger>
                   <TabsTrigger value="issuance">Ready to Issue</TabsTrigger>
+                  <TabsTrigger value="issued">Issued</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="pending">
@@ -161,6 +172,27 @@ export default function DepotDashboard() {
                     <ApplicationTable 
                       userType="depot" 
                       applications={issuanceApplications || []} 
+                    />
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="issued">
+                  {isLoadingIssued ? (
+                    <div className="flex items-center justify-center h-64">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary-500" />
+                    </div>
+                  ) : issuedError ? (
+                    <Card className="p-6 bg-red-50 border border-red-200">
+                      <h3 className="text-lg font-medium text-red-800">Error loading applications</h3>
+                      <p className="mt-2 text-sm text-red-700">
+                        We encountered a problem loading the applications. Please try refreshing the page.
+                      </p>
+                    </Card>
+                  ) : (
+                    <ApplicationTable 
+                      userType="depot" 
+                      applications={issuedApplications || []} 
+                      readOnly={true}
                     />
                   )}
                 </TabsContent>

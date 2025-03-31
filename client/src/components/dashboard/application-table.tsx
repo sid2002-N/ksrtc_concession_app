@@ -24,9 +24,10 @@ import {
 interface ApplicationTableProps {
   userType: "college" | "depot";
   applications: Application[];
+  readOnly?: boolean;
 }
 
-export function ApplicationTable({ userType, applications }: ApplicationTableProps) {
+export function ApplicationTable({ userType, applications, readOnly = false }: ApplicationTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterValue, setFilterValue] = useState("all");
   
@@ -171,7 +172,7 @@ export function ApplicationTable({ userType, applications }: ApplicationTablePro
                       {new Date(application.applicationDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      {userType === "college" && application.status === ApplicationStatus.PENDING && (
+                      {!readOnly && userType === "college" && application.status === ApplicationStatus.PENDING && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/college/verify/${application.id}`}>
                             <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
@@ -186,7 +187,7 @@ export function ApplicationTable({ userType, applications }: ApplicationTablePro
                         </div>
                       )}
                       
-                      {userType === "depot" && application.status === ApplicationStatus.COLLEGE_VERIFIED && (
+                      {!readOnly && userType === "depot" && application.status === ApplicationStatus.COLLEGE_VERIFIED && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/depot/approve/${application.id}`}>
                             <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
@@ -201,7 +202,7 @@ export function ApplicationTable({ userType, applications }: ApplicationTablePro
                         </div>
                       )}
                       
-                      {userType === "depot" && application.status === ApplicationStatus.PAYMENT_PENDING && (
+                      {!readOnly && userType === "depot" && application.status === ApplicationStatus.PAYMENT_PENDING && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/depot/approve/${application.id}?action=verify-payment`}>
                             <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
@@ -211,11 +212,21 @@ export function ApplicationTable({ userType, applications }: ApplicationTablePro
                         </div>
                       )}
                       
-                      {userType === "depot" && application.status === ApplicationStatus.PAYMENT_VERIFIED && (
+                      {!readOnly && userType === "depot" && application.status === ApplicationStatus.PAYMENT_VERIFIED && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/depot/approve/${application.id}?action=issue`}>
                             <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
                               Issue Pass
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
+                      
+                      {userType === "depot" && application.status === ApplicationStatus.ISSUED && (
+                        <div className="flex justify-end">
+                          <Link href={`/depot/approve/${application.id}?action=download`}>
+                            <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
+                              View Pass
                             </Button>
                           </Link>
                         </div>
