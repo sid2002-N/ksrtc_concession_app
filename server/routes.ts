@@ -10,6 +10,10 @@ import {
   documentUploadSchema,
   documentVerificationSchema
 } from "@shared/schema";
+import { 
+  sendStatusNotification, 
+  initializeScheduledNotifications 
+} from './services/notification.service';
 import { ZodError } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -211,8 +215,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update the application status
       const updatedApplication = await storage.updateApplicationStatus(applicationId, status, reason);
+      
+      // Get the student's user account to send notification
+      try {
+        const student = await storage.getStudent(application.studentId);
+        if (student) {
+          const studentUser = await storage.getUser(student.userId);
+          if (studentUser) {
+            // Send notification asynchronously (don't await)
+            sendStatusNotification(updatedApplication, studentUser)
+              .catch(err => console.error('Error sending notification:', err));
+            
+            console.log(`Notification queued for application ${applicationId} status change to ${status}`);
+          }
+        }
+      } catch (notifError) {
+        console.error('Error preparing notification:', notifError);
+        // Don't fail the request if notification fails
+      }
+      
       res.json(updatedApplication);
     } catch (error) {
+      console.error('Error updating application status:', error);
       res.status(500).json({ message: "Failed to update application status" });
     }
   });
@@ -256,6 +280,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
           paymentMethod: paymentData.paymentMethod
         }
       );
+      
+      // Send notification to depot about payment submission
+      try {
+        // Get depot user to send notification to
+        const depot = await storage.getDepot(application.depotId);
+        if (depot && depot.userId) {
+          const depotUser = await storage.getUser(depot.userId);
+          if (depotUser) {
+            // Send notification asynchronously (don't await)
+            sendStatusNotification(updatedApplication, depotUser)
+              .catch(err => console.error('Error sending payment notification:', err));
+            
+            console.log(`Payment notification queued for application ${applicationId}`);
+          }
+        }
+      } catch (notifError) {
+        console.error('Error preparing payment notification:', notifError);
+        // Don't fail the request if notification fails
+      }
       
       res.json(updatedApplication);
     } catch (error) {
@@ -647,6 +690,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       totalApplications: count
     };
   }
+
+  // Initialize scheduled notifications for reminders
+  initializeScheduledNotifications();
+  console.log('Scheduled notification service initialized');
 
   const httpServer = createServer(app);
   return httpServer;

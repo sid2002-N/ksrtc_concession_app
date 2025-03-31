@@ -388,4 +388,14 @@ export class MongoDBStorage implements IStorage {
       return undefined;
     }
   }
+  
+  async getAllApplications(): Promise<ApplicationType[]> {
+    try {
+      const applications = await ApplicationModel.find({});
+      return applications.map(app => documentToType<Application, IApplication>(app) as Application);
+    } catch (error) {
+      console.error('Error fetching all applications:', error);
+      return [];
+    }
+  }
 }
