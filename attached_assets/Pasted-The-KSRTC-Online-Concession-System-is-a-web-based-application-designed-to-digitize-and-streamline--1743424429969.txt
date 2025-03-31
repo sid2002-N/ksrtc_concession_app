@@ -1,0 +1,39 @@
+The KSRTC Online Concession System is a web-based application designed to digitize and 
+streamline the student concession application process for Kerala State Road Transport 
+Corporation (KSRTC). Traditionally, students had to manually apply for travel concessions 
+through their respective colleges, get approval, and then visit the KSRTC depot for final 
+verification and issuance of the concession pass. This project eliminates the inefficiencies of 
+the manual system by providing an automated, transparent, and user-friendly platform for 
+students, colleges, and KSRTC depots.
+The system allows students to create an account and submit their concession application online. 
+They are required to enter essential details such as name, college ID, date of birth, gender, 
+address, phone number, alternate phone number, email, course, department, semester, 
+start and end travel points, username, and password. Once submitted, the application is 
+sent to the respective college office for verification. College authorities have a dedicated login 
+where they can review student details and verify whether the applicant is currently enrolled in 
+the institution. If the verification is successful, the application is forwarded to the KSRTC 
+depot for further processing.
+The KSRTC depot officers also have their own login portal where they can access applications 
+that have been approved by colleges. They can either approve or reject the applications based 
+on eligibility criteria. If the application is approved, the student is notified and required to make 
+the necessary payment for the concession pass. The payment is made outside the application
+(via bank transfer, UPI, or other methods), and students must log in to their dashboard to submit 
+transaction details such as transaction ID, transaction date, name of the account holder, 
+and the amount paid. The depot officers then verify the transaction details before processing 
+and dispatching the concession pass.
+Once the transaction is verified, the KSRTC depot issues the concession pass, which is sent 
+to the student via postal service within 3-4 days. Students can track their application status 
+in real-time, from submission to approval and dispatch. Additionally, the system includes a 
+concession renewal feature, allowing students to renew their concession pass without having 
+to re-enter all their details. Colleges and students can also view the status of applications, 
+ensuring complete transparency in the process.
+The project is built using React.js for the frontend, ensuring a responsive and interactive user 
+interface. The backend is developed using Node.js and Express.js, handling API requests and 
+application logic. The system utilizes MongoDB for efficient data storage and retrieval, while 
+JWT (JSON Web Token) is used for secure authentication. The interface is styled using 
+CSS/Tailwind, providing a modern and user-friendly experience.
+The KSRTC Online Concession System significantly improves the efficiency of the concession 
+approval process by reducing paperwork, eliminating delays, and providing real-time status 
+tracking. By introducing automated verification, secure transactions, and digital recordkeeping, the system ensures a faster, more reliable, and student-friendly approach to obtaining 
+KSRTC travel concessions. This digital transformation makes the concession process more 
+accessible and efficient for students, colleges, and KSRTC depots alike.
