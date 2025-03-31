@@ -1,11 +1,14 @@
-import { applications, colleges, depots, students, users, ApplicationStatus } from "@shared/schema";
+import { 
+  applications, colleges, depots, students, users, 
+  ApplicationStatus, UserType 
+} from "@shared/schema";
 import type { 
   User, InsertUser, 
   Student, InsertStudent, 
   College, InsertCollege, 
   Depot, InsertDepot, 
   Application, InsertApplication,
-  UserType, PaymentDetails,
+  PaymentDetails,
   DocumentUpload, DocumentVerification
 } from "@shared/schema";
 import { MongoDBStorage } from "./db/MongoDBStorage";
@@ -148,10 +151,73 @@ export class MemStorage implements IStorage {
     ];
     
     // Initialize colleges
-    colleges.forEach(college => this.createCollege(college));
+    let createdColleges = colleges.map(college => this.createCollege(college));
     
     // Initialize depots
-    depots.forEach(depot => this.createDepot(depot));
+    let createdDepots = depots.map(depot => this.createDepot(depot));
+    
+    // The following hashed passwords are for 'password123'
+    // We're using Promise.all with an IIFE to await promises in constructor
+    (async () => {
+      try {
+        // Add sample users with pre-hashed passwords (all passwords are 'password123')
+        const hashedPassword = "fe8df1b0cb0c0be6207a3b25cbae47adf29ce49125e81e0b13a86d1be6171ade639e75a293e5638c4be17ee7c26aa75504e569e0f1f1431991950986d7943423.a9e40f3c3b3c1145e0fb1e3c9624e6f2";
+        
+        // Sample students
+        const studentUser = await this.createUser({
+          username: "student1",
+          password: hashedPassword,
+          email: "student1@example.com",
+          phone: "9876543210",
+          userType: UserType.STUDENT,
+          collegeId: 1,
+          depotId: null
+        });
+        
+        await this.createStudent({
+          userId: studentUser.id,
+          firstName: "Arjun",
+          lastName: "Kumar",
+          dateOfBirth: "2001-05-15",
+          gender: "Male",
+          address: "123 College Road, Thrissur",
+          collegeId: 1,
+          collegeIdNumber: "GEC20001",
+          course: "B.Tech",
+          department: "Computer Science",
+          semester: 5,
+          photoUrl: null,
+          documentUrl: null,
+          altPhone: null
+        });
+        
+        // Sample college admin
+        const collegeUser = await this.createUser({
+          username: "college1",
+          password: hashedPassword,
+          email: "college1@example.com",
+          phone: "9876543211",
+          userType: UserType.COLLEGE,
+          collegeId: 1,
+          depotId: null
+        });
+        
+        // Sample depot admin
+        const depotUser = await this.createUser({
+          username: "depot1",
+          password: hashedPassword,
+          email: "depot1@example.com",
+          phone: "9876543212",
+          userType: UserType.DEPOT,
+          collegeId: null,
+          depotId: 1
+        });
+        
+        console.log("Sample users created successfully");
+      } catch (error) {
+        console.error("Error creating sample users:", error);
+      }
+    })();
   }
 
   // User operations
