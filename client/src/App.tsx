@@ -16,6 +16,15 @@ import CollegeVerify from "@/pages/college/verify";
 import DepotDashboard from "@/pages/depot/dashboard";
 import DepotApprove from "@/pages/depot/approve";
 import { UserType } from "@shared/schema";
+import React, { Suspense } from "react";
+
+// Lazy load analytics components
+const AnalyticsDashboard = React.lazy(() => import("@/pages/depot/analytics"));
+const ApplicationsAnalytics = React.lazy(() => import("@/pages/depot/analytics/applications"));
+const CollegesAnalytics = React.lazy(() => import("@/pages/depot/analytics/colleges"));
+const DepotsAnalytics = React.lazy(() => import("@/pages/depot/analytics/depots"));
+const PaymentsAnalytics = React.lazy(() => import("@/pages/depot/analytics/payments"));
+const ProcessingAnalytics = React.lazy(() => import("@/pages/depot/analytics/processing"));
 
 function Router() {
   return (
@@ -39,6 +48,62 @@ function Router() {
       {/* Depot Routes */}
       <ProtectedRoute path="/depot/dashboard" component={DepotDashboard} userType={UserType.DEPOT} />
       <ProtectedRoute path="/depot/approve/:id" component={DepotApprove} userType={UserType.DEPOT} />
+      
+      {/* Admin Analytics Routes */}
+      <ProtectedRoute 
+        path="/admin/analytics" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
+            <AnalyticsDashboard />
+          </Suspense>
+        )} 
+        userType={UserType.DEPOT} 
+      />
+      <ProtectedRoute 
+        path="/admin/analytics/applications" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
+            <ApplicationsAnalytics />
+          </Suspense>
+        )} 
+        userType={UserType.DEPOT} 
+      />
+      <ProtectedRoute 
+        path="/admin/analytics/colleges" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
+            <CollegesAnalytics />
+          </Suspense>
+        )} 
+        userType={UserType.DEPOT} 
+      />
+      <ProtectedRoute 
+        path="/admin/analytics/depots" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
+            <DepotsAnalytics />
+          </Suspense>
+        )} 
+        userType={UserType.DEPOT} 
+      />
+      <ProtectedRoute 
+        path="/admin/analytics/payments" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
+            <PaymentsAnalytics />
+          </Suspense>
+        )} 
+        userType={UserType.DEPOT} 
+      />
+      <ProtectedRoute 
+        path="/admin/analytics/processing" 
+        component={() => (
+          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
+            <ProcessingAnalytics />
+          </Suspense>
+        )} 
+        userType={UserType.DEPOT} 
+      />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

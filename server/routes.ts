@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth } from "./auth";
@@ -17,7 +17,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   setupAuth(app);
 
   // Helper middleware to check if user is authenticated
-  const isAuthenticated = (req, res, next) => {
+  const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     if (req.isAuthenticated()) {
       return next();
     }
@@ -25,11 +25,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   };
 
   // Helper middleware to check if user has a specific role
-  const hasRole = (role: UserType) => (req, res, next) => {
-    if (req.isAuthenticated() && req.user.userType === role) {
+  const hasRole = (role: UserType) => (req: Request, res: Response, next: NextFunction) => {
+    if (req.isAuthenticated() && req.user && req.user.userType === role) {
       return next();
     }
     res.status(403).json({ message: "Forbidden" });
+  };
+  
+  // Helper middleware to check if user is an admin (DEPOT role for now)
+  const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+    if (req.isAuthenticated() && req.user && req.user.userType === UserType.DEPOT) {
+      return next();
+    }
+    res.status(403).json({ message: "Admin access required" });
   };
 
   // GET /api/colleges - Get all colleges
@@ -323,6 +331,322 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
+
+  // ========== ANALYTICS ENDPOINTS ==========
+
+  // GET /api/analytics/applications/status - Get application count by status
+  app.get("/api/analytics/applications/status", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get all applications
+      const applications = await storage.getAllApplications();
+      
+      // Count applications by status
+      const statusCounts: Record<string, number> = {};
+      
+      // Initialize counters for all statuses
+      Object.values(ApplicationStatus).forEach(status => {
+        statusCounts[status] = 0;
+      });
+      
+      // Count applications by status
+      applications.forEach(app => {
+        if (statusCounts[app.status] !== undefined) {
+          statusCounts[app.status]++;
+        }
+      });
+      
+      res.json({
+        totalApplications: applications.length,
+        statusCounts
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch application status analytics" });
+    }
+  });
+
+  // GET /api/analytics/applications/timeline - Get application count timeline by month
+  app.get("/api/analytics/applications/timeline", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get all applications
+      const applications = await storage.getAllApplications();
+      
+      // Group applications by month
+      const monthlyStats: Record<string, {total: number, byStatus: Record<string, number>}> = {};
+      
+      applications.forEach(app => {
+        const date = new Date(app.applicationDate);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        
+        if (!monthlyStats[monthYear]) {
+          monthlyStats[monthYear] = { 
+            total: 0, 
+            byStatus: Object.fromEntries(Object.values(ApplicationStatus).map(status => [status, 0]))
+          };
+        }
+        
+        monthlyStats[monthYear].total++;
+        monthlyStats[monthYear].byStatus[app.status]++;
+      });
+      
+      // Sort by date (chronologically)
+      const sortedTimeline = Object.entries(monthlyStats)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, stats]) => ({
+          month,
+          ...stats
+        }));
+      
+      res.json(sortedTimeline);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch application timeline analytics" });
+    }
+  });
+
+  // GET /api/analytics/colleges/applications - Get application counts by college
+  app.get("/api/analytics/colleges/applications", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get all colleges
+      const colleges = await storage.getAllColleges();
+      
+      // Get all applications
+      const applications = await storage.getAllApplications();
+      
+      // Count applications by college
+      const collegeStats = colleges.map(college => {
+        const collegeApps = applications.filter(app => app.collegeId === college.id);
+        
+        // Count by status
+        const statusCounts: Record<string, number> = {};
+        
+        // Initialize counters for all statuses
+        Object.values(ApplicationStatus).forEach(status => {
+          statusCounts[status] = 0;
+        });
+        
+        // Count by status
+        collegeApps.forEach(app => {
+          statusCounts[app.status]++;
+        });
+        
+        return {
+          collegeId: college.id,
+          collegeName: college.name,
+          totalApplications: collegeApps.length,
+          statusCounts
+        };
+      });
+      
+      // Sort by total applications count (descending)
+      collegeStats.sort((a, b) => b.totalApplications - a.totalApplications);
+      
+      res.json(collegeStats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch college analytics" });
+    }
+  });
+
+  // GET /api/analytics/depots/applications - Get application counts by depot
+  app.get("/api/analytics/depots/applications", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get all depots
+      const depots = await storage.getAllDepots();
+      
+      // Get all applications
+      const applications = await storage.getAllApplications();
+      
+      // Count applications by depot
+      const depotStats = depots.map(depot => {
+        const depotApps = applications.filter(app => app.depotId === depot.id);
+        
+        // Count by status
+        const statusCounts: Record<string, number> = {};
+        
+        // Initialize counters for all statuses
+        Object.values(ApplicationStatus).forEach(status => {
+          statusCounts[status] = 0;
+        });
+        
+        // Count by status
+        depotApps.forEach(app => {
+          statusCounts[app.status]++;
+        });
+        
+        // Calculate average processing time (for approved applications)
+        let totalProcessingDays = 0;
+        let processedCount = 0;
+        
+        depotApps.forEach(app => {
+          if (app.status === ApplicationStatus.ISSUED && app.applicationDate && app.issuedAt) {
+            const applicationDate = new Date(app.applicationDate);
+            const issuedDate = new Date(app.issuedAt);
+            const diffTime = Math.abs(issuedDate.getTime() - applicationDate.getTime());
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            totalProcessingDays += diffDays;
+            processedCount++;
+          }
+        });
+        
+        const avgProcessingDays = processedCount > 0 ? totalProcessingDays / processedCount : 0;
+        
+        return {
+          depotId: depot.id,
+          depotName: depot.name,
+          totalApplications: depotApps.length,
+          avgProcessingDays,
+          statusCounts
+        };
+      });
+      
+      // Sort by total applications count (descending)
+      depotStats.sort((a, b) => b.totalApplications - a.totalApplications);
+      
+      res.json(depotStats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch depot analytics" });
+    }
+  });
+
+  // GET /api/analytics/payments/summary - Get payment statistics
+  app.get("/api/analytics/payments/summary", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get applications with payment details
+      const applications = await storage.getAllApplications();
+      const paidApplications = applications.filter(app => 
+        app.paymentDetails && 
+        app.paymentDetails.transactionId &&
+        app.status !== ApplicationStatus.PENDING
+      );
+      
+      // Calculate payment statistics
+      const totalRevenue = paidApplications.reduce((sum, app) => 
+        sum + (app.paymentDetails?.amount || 0), 0);
+      
+      // Group by payment method
+      const paymentMethodStats: Record<string, {count: number, amount: number}> = {};
+      
+      paidApplications.forEach(app => {
+        const method = app.paymentDetails?.paymentMethod || 'Unknown';
+        
+        if (!paymentMethodStats[method]) {
+          paymentMethodStats[method] = { count: 0, amount: 0 };
+        }
+        
+        paymentMethodStats[method].count++;
+        paymentMethodStats[method].amount += app.paymentDetails?.amount || 0;
+      });
+      
+      // Group by month
+      const monthlyRevenue: Record<string, number> = {};
+      
+      paidApplications.forEach(app => {
+        if (app.paymentDetails?.transactionDate) {
+          const date = new Date(app.paymentDetails.transactionDate);
+          const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          
+          if (!monthlyRevenue[monthYear]) {
+            monthlyRevenue[monthYear] = 0;
+          }
+          
+          monthlyRevenue[monthYear] += app.paymentDetails?.amount || 0;
+        }
+      });
+      
+      // Sort monthly revenue by date
+      const sortedMonthlyRevenue = Object.entries(monthlyRevenue)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([month, amount]) => ({ month, amount }));
+      
+      res.json({
+        totalPayments: paidApplications.length,
+        totalRevenue,
+        averagePaymentAmount: paidApplications.length > 0 ? totalRevenue / paidApplications.length : 0,
+        paymentMethodStats,
+        monthlyRevenue: sortedMonthlyRevenue
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payment analytics" });
+    }
+  });
+
+  // GET /api/analytics/processing-time - Get application processing time statistics
+  app.get("/api/analytics/processing-time", isAuthenticated, isAdmin, async (req: Request, res: Response) => {
+    try {
+      // Get all applications
+      const applications = await storage.getAllApplications();
+      
+      // Calculate average time between status changes
+      const processingTimeStats = {
+        // Avg time from application submission to college verification
+        submissionToCollegeVerification: calculateAverageTimeBetweenStatuses(
+          applications,
+          app => app.applicationDate, 
+          app => app.collegeVerifiedAt
+        ),
+        
+        // Avg time from college verification to depot approval
+        collegeVerificationToDepotApproval: calculateAverageTimeBetweenStatuses(
+          applications,
+          app => app.collegeVerifiedAt, 
+          app => app.depotApprovedAt
+        ),
+        
+        // Avg time from depot approval to payment verification
+        depotApprovalToPaymentVerification: calculateAverageTimeBetweenStatuses(
+          applications,
+          app => app.depotApprovedAt, 
+          app => app.paymentVerifiedAt
+        ),
+        
+        // Avg time from payment verification to issuance
+        paymentVerificationToIssuance: calculateAverageTimeBetweenStatuses(
+          applications,
+          app => app.paymentVerifiedAt, 
+          app => app.issuedAt
+        ),
+        
+        // Overall avg processing time (from submission to issuance)
+        overallProcessingTime: calculateAverageTimeBetweenStatuses(
+          applications,
+          app => app.applicationDate, 
+          app => app.issuedAt
+        )
+      };
+      
+      res.json(processingTimeStats);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch processing time analytics" });
+    }
+  });
+
+  // Helper function to calculate average time between status changes
+  function calculateAverageTimeBetweenStatuses(
+    applications: any[], 
+    getStartDate: (app: any) => Date | null | undefined, 
+    getEndDate: (app: any) => Date | null | undefined
+  ) {
+    let totalDays = 0;
+    let count = 0;
+    
+    applications.forEach(app => {
+      const startDate = getStartDate(app);
+      const endDate = getEndDate(app);
+      
+      if (startDate && endDate) {
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+        const diffTime = Math.abs(endDateObj.getTime() - startDateObj.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        totalDays += diffDays;
+        count++;
+      }
+    });
+    
+    return {
+      averageDays: count > 0 ? totalDays / count : 0,
+      totalApplications: count
+    };
+  }
 
   const httpServer = createServer(app);
   return httpServer;

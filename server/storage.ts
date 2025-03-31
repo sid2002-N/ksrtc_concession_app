@@ -44,6 +44,7 @@ export interface IStorage {
   getApplicationsByStudentId(studentId: number): Promise<Application[]>;
   getApplicationsByCollegeId(collegeId: number, status?: ApplicationStatus): Promise<Application[]>;
   getApplicationsByDepotId(depotId: number, status?: ApplicationStatus): Promise<Application[]>;
+  getAllApplications(): Promise<Application[]>;
   createApplication(application: InsertApplication): Promise<Application>;
   updateApplicationStatus(id: number, status: ApplicationStatus, reason?: string): Promise<Application | undefined>;
   updateApplicationPayment(id: number, paymentDetails: PaymentDetails): Promise<Application | undefined>;
@@ -304,6 +305,10 @@ export class MemStorage implements IStorage {
     }
     
     return applications;
+  }
+  
+  async getAllApplications(): Promise<Application[]> {
+    return Array.from(this.applications.values());
   }
   
   async createApplication(insertApplication: InsertApplication): Promise<Application> {
