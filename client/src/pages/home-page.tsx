@@ -1,5 +1,5 @@
-import { Navbar } from "@/components/layouts/navbar";
-import { Footer } from "@/components/layouts/footer";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar />
+      <Header />
       
       <main className="flex-grow">
         {/* Hero Section */}
