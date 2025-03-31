@@ -75,6 +75,11 @@ export function ApplicationStatusCard({ application }: ApplicationStatusProps) {
 
   const { label, color, progress, message } = getStatusInfo();
 
+const progressBarStyle = {
+  width: `${progress}%`,
+  transition: 'width 1s ease-in-out, background-color 0.3s ease'
+};
+
   return (
     <div className="bg-white overflow-hidden shadow rounded-lg">
       <div className="px-4 py-5 sm:p-6">
