@@ -46,33 +46,15 @@ function Router() {
       <ProtectedRoute path="/depot/dashboard" component={DepotDashboard} userType={UserType.DEPOT} />
       <ProtectedRoute path="/depot/approve/:id" component={DepotApprove} userType={UserType.DEPOT} />
       
-      {/* Analytics Routes - Both protected and public */}
+      {/* Analytics Routes */}
       <ProtectedRoute 
-        path="/admin/analytics/*" 
+        path="/admin/analytics/:section?" 
         component={() => (
           <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
             <AnalyticsDashboard />
           </Suspense>
         )} 
         userType={UserType.DEPOT} 
-      />
-      
-      {/* Public Analytics Route */}
-      <Route 
-        path="/admin/analytics" 
-        component={() => (
-          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
-            <AnalyticsDashboard />
-          </Suspense>
-        )}
-      />
-      <Route 
-        path="/admin/analytics/:section" 
-        component={() => (
-          <Suspense fallback={<div className="flex items-center justify-center min-h-screen"><div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}>
-            <AnalyticsDashboard />
-          </Suspense>
-        )}
       />
       
       {/* Fallback to 404 */}
