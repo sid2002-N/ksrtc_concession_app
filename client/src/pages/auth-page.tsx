@@ -313,29 +313,13 @@ export default function AuthPage() {
                   {/* Registration type selector */}
                   <div className="border-b border-gray-200 mb-4">
                     <div className="flex justify-center">
-                      <TabsList className="h-auto border-b">
-                        <TabsTrigger 
-                          value="student" 
-                          onClick={() => setRegistrationType("student")}
-                          className={registrationType === "student" ? "py-2 px-4 text-primary-600 border-b-2 border-primary-500" : "py-2 px-4 text-gray-500"}
-                        >
-                          Student
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="college" 
-                          onClick={() => setRegistrationType("college")}
-                          className={registrationType === "college" ? "py-2 px-4 text-primary-600 border-b-2 border-primary-500" : "py-2 px-4 text-gray-500"}
-                        >
-                          College
-                        </TabsTrigger>
-                        <TabsTrigger 
-                          value="depot" 
-                          onClick={() => setRegistrationType("depot")}
-                          className={registrationType === "depot" ? "py-2 px-4 text-primary-600 border-b-2 border-primary-500" : "py-2 px-4 text-gray-500"}
-                        >
-                          KSRTC Depot
-                        </TabsTrigger>
-                      </TabsList>
+                      <Tabs value={registrationType} onValueChange={setRegistrationType}>
+                        <TabsList className="h-auto">
+                          <TabsTrigger value="student">Student</TabsTrigger>
+                          <TabsTrigger value="college">College</TabsTrigger>
+                          <TabsTrigger value="depot">KSRTC Depot</TabsTrigger>
+                        </TabsList>
+                      </Tabs>
                     </div>
                   </div>
                   
