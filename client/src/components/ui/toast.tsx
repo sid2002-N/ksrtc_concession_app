@@ -126,11 +126,6 @@ export {
   ToastAction,
 }
 import { useState, useEffect } from 'react';
-
-interface ToastProps {
-  message: string;
-  type: 'success' | 'error';
-  duration?: number;
   onClose: () => void;
 }
 
