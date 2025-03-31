@@ -1,29 +1,32 @@
 import mongoose from 'mongoose';
 import { log } from '../vite';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ksrtc_concession';
-const USE_MONGODB = process.env.USE_MONGODB === 'true';
-
-// Database connection
-export async function connectToDB() {
-  // Skip MongoDB connection if not using it
-  if (!USE_MONGODB) {
-    log('Using in-memory storage, skipping MongoDB connection', 'mongoose');
-    return null;
-  }
-  
+// Connect to MongoDB database
+export async function connectToDB(): Promise<boolean> {
   try {
-    await mongoose.connect(MONGODB_URI);
-    log('Connected to MongoDB database', 'mongoose');
-    return mongoose.connection;
+    // Get connection string from environment variables
+    const uri = process.env.MONGODB_URI || 'mongodb://localhost:27017/ksrtc-concession';
+    
+    // Set mongoose options
+    mongoose.set('strictQuery', true);
+    
+    // Connect to MongoDB
+    await mongoose.connect(uri);
+    
+    log(`Connected to MongoDB successfully at ${uri}`, 'mongoose');
+    return true;
   } catch (error) {
-    log(`MongoDB connection error: ${error}`, 'mongoose');
-    log('Falling back to in-memory storage', 'mongoose');
-    return null;
+    console.error('Error connecting to MongoDB:', error);
+    return false;
   }
 }
 
-export function disconnectFromDB() {
-  if (!USE_MONGODB) return Promise.resolve();
-  return mongoose.disconnect();
+// Disconnect from MongoDB database
+export function disconnectFromDB(): void {
+  try {
+    mongoose.disconnect();
+    log('Disconnected from MongoDB', 'mongoose');
+  } catch (error) {
+    console.error('Error disconnecting from MongoDB:', error);
+  }
 }

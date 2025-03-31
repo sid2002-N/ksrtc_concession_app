@@ -365,9 +365,26 @@ export class MemStorage implements IStorage {
   }
 }
 
-// Use in-memory storage in development, MongoDB in production
-// Uncomment the following line to use MongoDB storage:
-// export const storage = new MongoDBStorage();
+// Storage types
+export enum StorageType {
+  MEMORY = 'memory',
+  MONGODB = 'mongodb'
+}
 
-// For now, we'll stick with in-memory storage for development and testing:
-export const storage = new MemStorage();
+// Storage factory
+let storageInstance: IStorage;
+
+export async function initializeStorage(type: StorageType): Promise<void> {
+  switch (type) {
+    case StorageType.MONGODB:
+      storageInstance = new MongoDBStorage();
+      break;
+    case StorageType.MEMORY:
+    default:
+      storageInstance = new MemStorage();
+      break;
+  }
+}
+
+// Export the storage instance
+export const storage: IStorage = new MemStorage(); // Default to memory storage

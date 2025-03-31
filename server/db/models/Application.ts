@@ -5,53 +5,54 @@ export interface IApplication extends Document {
   studentId: mongoose.Types.ObjectId;
   collegeId: mongoose.Types.ObjectId;
   depotId: mongoose.Types.ObjectId;
-  fromLocation: string;
-  toLocation: string;
-  distance: number;
-  routeDetails: string;
+  startPoint: string;
+  endPoint: string;
   status: ApplicationStatus;
-  statusReason: string;
+  rejectionReason: string | null;
+  applicationDate: Date;
+  collegeVerifiedAt: Date | null;
+  depotApprovedAt: Date | null;
+  paymentVerifiedAt: Date | null;
+  issuedAt: Date | null;
   paymentDetails: {
     transactionId: string;
     transactionDate: Date;
     accountHolder: string;
     amount: number;
     paymentMethod: string;
-  };
-  createdAt: Date;
-  updatedAt: Date;
+  } | null;
+  isRenewal: boolean;
 }
 
 const ApplicationSchema = new Schema<IApplication>({
   studentId: { type: Schema.Types.ObjectId, ref: 'Student', required: true },
   collegeId: { type: Schema.Types.ObjectId, ref: 'College', required: true },
   depotId: { type: Schema.Types.ObjectId, ref: 'Depot', required: true },
-  fromLocation: { type: String, required: true },
-  toLocation: { type: String, required: true },
-  distance: { type: Number, required: true },
-  routeDetails: { type: String, required: true },
+  startPoint: { type: String, required: true },
+  endPoint: { type: String, required: true },
   status: { 
     type: String, 
     required: true, 
     enum: Object.values(ApplicationStatus),
-    default: ApplicationStatus.PENDING
+    default: ApplicationStatus.PENDING 
   },
-  statusReason: { type: String, default: '' },
+  rejectionReason: { type: String, default: null },
+  applicationDate: { type: Date, default: Date.now },
+  collegeVerifiedAt: { type: Date, default: null },
+  depotApprovedAt: { type: Date, default: null },
+  paymentVerifiedAt: { type: Date, default: null },
+  issuedAt: { type: Date, default: null },
   paymentDetails: {
-    transactionId: { type: String, default: '' },
-    transactionDate: { type: Date },
-    accountHolder: { type: String, default: '' },
-    amount: { type: Number, default: 0 },
-    paymentMethod: { type: String, default: '' }
+    type: {
+      transactionId: String,
+      transactionDate: Date,
+      accountHolder: String,
+      amount: Number,
+      paymentMethod: String
+    },
+    default: null
   },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
-});
-
-// Update the updatedAt field on save
-ApplicationSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
+  isRenewal: { type: Boolean, default: false }
 });
 
 export const Application = mongoose.model<IApplication>('Application', ApplicationSchema);

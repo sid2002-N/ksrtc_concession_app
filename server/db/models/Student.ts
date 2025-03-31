@@ -2,36 +2,42 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IStudent extends Document {
   userId: mongoose.Types.ObjectId;
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  collegeIdNumber: string;
   dateOfBirth: Date;
   gender: string;
+  altPhone: string | null;
   address: string;
-  collegeId: mongoose.Types.ObjectId;
   course: string;
-  startYear: number;
-  endYear: number;
-  idCard: string;
-  photo: string;
-  collegeIdCard: string;
+  department: string;
+  semester: string;
+  collegeId: mongoose.Types.ObjectId;
+  photoUrl: string | null;
+  idCardUrl: string | null;
+  addressProofUrl: string | null;
   documentsVerified: boolean;
-  verificationNotes: string;
+  verificationNotes: string | null;
 }
 
 const StudentSchema = new Schema<IStudent>({
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  fullName: { type: String, required: true },
+  firstName: { type: String, required: true },
+  lastName: { type: String, required: true },
+  collegeIdNumber: { type: String, required: true },
   dateOfBirth: { type: Date, required: true },
   gender: { type: String, required: true },
+  altPhone: { type: String, default: null },
   address: { type: String, required: true },
-  collegeId: { type: Schema.Types.ObjectId, ref: 'College', required: true },
   course: { type: String, required: true },
-  startYear: { type: Number, required: true },
-  endYear: { type: Number, required: true },
-  idCard: { type: String, default: '' },
-  photo: { type: String, default: '' },
-  collegeIdCard: { type: String, default: '' },
+  department: { type: String, required: true },
+  semester: { type: String, required: true },
+  collegeId: { type: Schema.Types.ObjectId, ref: 'College', required: true },
+  photoUrl: { type: String, default: null },
+  idCardUrl: { type: String, default: null },
+  addressProofUrl: { type: String, default: null },
   documentsVerified: { type: Boolean, default: false },
-  verificationNotes: { type: String, default: '' }
+  verificationNotes: { type: String, default: null }
 });
 
 export const Student = mongoose.model<IStudent>('Student', StudentSchema);

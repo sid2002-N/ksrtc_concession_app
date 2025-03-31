@@ -1,5 +1,5 @@
-export { User, IUser } from './User';
-export { Student, IStudent } from './Student';
-export { College, ICollege } from './College';
-export { Depot, IDepot } from './Depot';
-export { Application, IApplication } from './Application';
+export * from './User';
+export * from './Student';
+export * from './College';
+export * from './Depot';
+export * from './Application';

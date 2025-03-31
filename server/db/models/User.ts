@@ -19,7 +19,7 @@ const UserSchema = new Schema<IUser>({
   userType: { 
     type: String, 
     required: true, 
-    enum: Object.values(UserType)
+    enum: [UserType.STUDENT, UserType.COLLEGE, UserType.DEPOT]
   },
   phone: { type: String, required: true },
   collegeId: { type: Schema.Types.ObjectId, ref: 'College', default: null },
