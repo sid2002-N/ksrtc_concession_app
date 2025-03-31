@@ -19,8 +19,9 @@ import DepotStats from "./depot-stats";
 const AnalyticsDashboard = () => {
   const [timeRange, setTimeRange] = useState<string>("all");
 
-  const { data: overviewData, isLoading: isOverviewLoading } = useQuery({
+  const { data: overviewData, isLoading: isOverviewLoading, error: overviewError } = useQuery({
     queryKey: ["/api/analytics/applications/status"],
+    onError: (error) => console.error("Analytics loading error:", error)
   });
 
   const { data: timelineData, isLoading: isTimelineLoading } = useQuery({
