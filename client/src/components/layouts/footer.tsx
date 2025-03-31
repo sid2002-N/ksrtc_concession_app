@@ -45,23 +45,23 @@ export function Footer() {
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase">Quick Links</h3>
             <ul className="mt-4 space-y-4">
               <li>
-                <Link href="/">
-                  <a className="text-base text-gray-300 hover:text-white">Home</a>
+                <Link href="/" className="text-base text-gray-300 hover:text-white">
+                  Home
                 </Link>
               </li>
               <li>
-                <Link href="/about">
-                  <a className="text-base text-gray-300 hover:text-white">About Us</a>
+                <Link href="/about" className="text-base text-gray-300 hover:text-white">
+                  About Us
                 </Link>
               </li>
               <li>
-                <Link href="/contact">
-                  <a className="text-base text-gray-300 hover:text-white">Contact</a>
+                <Link href="/contact" className="text-base text-gray-300 hover:text-white">
+                  Contact
                 </Link>
               </li>
               <li>
-                <Link href="/faq">
-                  <a className="text-base text-gray-300 hover:text-white">FAQ</a>
+                <Link href="/faq" className="text-base text-gray-300 hover:text-white">
+                  FAQ
                 </Link>
               </li>
             </ul>

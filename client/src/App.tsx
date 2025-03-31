@@ -3,6 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import HomePage from "@/pages/home-page";
 import AuthPage from "@/pages/auth-page";
+import AboutPage from "@/pages/about";
+import ContactPage from "@/pages/contact";
+import FaqPage from "@/pages/faq";
 import { ProtectedRoute } from "./lib/protected-route";
 import StudentDashboard from "@/pages/student/dashboard";
 import StudentApply from "@/pages/student/apply";
@@ -18,6 +21,9 @@ function Router() {
     <Switch>
       <Route path="/" component={HomePage} />
       <Route path="/auth" component={AuthPage} />
+      <Route path="/about" component={AboutPage} />
+      <Route path="/contact" component={ContactPage} />
+      <Route path="/faq" component={FaqPage} />
       
       {/* Student Routes */}
       <ProtectedRoute path="/student/dashboard" component={StudentDashboard} userType="student" />

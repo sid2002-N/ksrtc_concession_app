@@ -68,7 +68,7 @@ export default function HomePage() {
                     )}
                   </div>
                   <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <Link href="#track">
+                    <Link href="/student/track">
                       <Button 
                         size="lg" 
                         className="w-full bg-white text-blue-700 hover:bg-gray-50 py-3 border border-blue-300"
@@ -270,15 +270,21 @@ export default function HomePage() {
                       <div className="px-4 py-5 sm:p-6">
                         <h3 className="text-lg leading-6 font-medium text-gray-900">Quick Actions</h3>
                         <div className="mt-5 grid grid-cols-1 gap-3">
-                          <Button className="bg-blue-600 text-white hover:bg-blue-700">
-                            Submit Payment Details
-                          </Button>
-                          <Button className="bg-white text-blue-700 hover:bg-gray-50 border border-blue-300">
-                            Download Application
-                          </Button>
-                          <Button className="bg-white text-blue-700 hover:bg-gray-50 border border-blue-300">
-                            Contact Support
-                          </Button>
+                          <Link href="/auth">
+                            <Button className="w-full bg-blue-600 text-white hover:bg-blue-700">
+                              Submit Payment Details
+                            </Button>
+                          </Link>
+                          <Link href="/auth">
+                            <Button className="w-full bg-white text-blue-700 hover:bg-gray-50 border border-blue-300">
+                              Download Application
+                            </Button>
+                          </Link>
+                          <Link href="/contact">
+                            <Button className="w-full bg-white text-blue-700 hover:bg-gray-50 border border-blue-300">
+                              Contact Support
+                            </Button>
+                          </Link>
                         </div>
                       </div>
                     </div>
