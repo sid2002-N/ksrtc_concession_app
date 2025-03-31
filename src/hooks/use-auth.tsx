@@ -9,15 +9,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
-// Create context with a default value
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isLoading: true,
-  login: async () => {},
-  logout: async () => {}
-});
+const AuthContext = createContext<AuthContextType | null>(null);
 
-// Export the provider component separately from the context
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -33,6 +26,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const userData = await response.json();
         setUser(userData);
       }
+    } catch (error) {
+      console.error('Error fetching user:', error);
     } finally {
       setIsLoading(false);
     }
@@ -58,14 +53,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(null);
   }
 
-  return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
-      {children}
-    </AuthContext.Provider>
-  );
+  const value = { user, isLoading, login, logout };
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-// Export the hook
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }
