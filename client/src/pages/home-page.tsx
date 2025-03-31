@@ -50,19 +50,19 @@ export default function HomePage() {
                   <div className="rounded-md shadow">
                     {user ? (
                       <Button 
-                        variant="secondary" 
+                        variant="default" 
                         size="lg" 
                         onClick={redirectToDashboard}
-                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-white hover:bg-gray-50"
+                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
                       >
                         Go to Dashboard
                       </Button>
                     ) : (
                       <Link href="/auth?tab=register">
                         <Button 
-                          variant="secondary" 
+                          variant="default" 
                           size="lg" 
-                          className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-white hover:bg-gray-50"
+                          className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
                         >
                           Apply Now
                         </Button>
@@ -72,9 +72,9 @@ export default function HomePage() {
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <Link href="#track">
                       <Button 
-                        variant="outline" 
+                        variant="secondary" 
                         size="lg" 
-                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700"
+                        className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-primary-700 bg-white hover:bg-gray-50"
                       >
                         Track Application
                       </Button>
@@ -229,8 +229,8 @@ export default function HomePage() {
                       </div>
                       <div className="bg-gray-50 px-4 py-4 sm:px-6">
                         <div className="text-sm">
-                          <Link href="/auth">
-                            <a className="font-medium text-primary-600 hover:text-primary-500">View full details</a>
+                          <Link href="/auth" className="font-medium text-primary-600 hover:text-primary-500">
+                            View full details
                           </Link>
                         </div>
                       </div>
@@ -261,8 +261,8 @@ export default function HomePage() {
                       </div>
                       <div className="bg-gray-50 px-4 py-4 sm:px-6">
                         <div className="text-sm">
-                          <Link href="/auth">
-                            <a className="font-medium text-primary-600 hover:text-primary-500">Edit application</a>
+                          <Link href="/auth" className="font-medium text-primary-600 hover:text-primary-500">
+                            Edit application
                           </Link>
                         </div>
                       </div>
