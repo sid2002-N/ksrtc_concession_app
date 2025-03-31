@@ -45,14 +45,25 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    new LocalStrategy({
+      usernameField: 'username',
+      passwordField: 'password',
+      passReqToCallback: true
+    }, async (req, username, password, done) => {
       try {
         const user = await storage.getUserByUsername(username);
+        
+        // If user not found or wrong password, return false
         if (!user || !(await comparePasswords(password, user.password))) {
           return done(null, false);
-        } else {
-          return done(null, user);
         }
+        
+        // Check if userType matches (only if specified in request)
+        if (req.body.userType && user.userType !== req.body.userType) {
+          return done(null, false);
+        }
+        
+        return done(null, user);
       } catch (err) {
         return done(err);
       }
