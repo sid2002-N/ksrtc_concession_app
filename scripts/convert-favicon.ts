@@ -12,6 +12,11 @@ async function convertFaviconToPng() {
   const pngPath = path.join(__dirname, '../public/favicon.png');
   
   try {
+    if (!fs.existsSync(svgPath)) {
+      console.error('Error: favicon.svg not found at:', svgPath);
+      return;
+    }
+    
     const svgBuffer = fs.readFileSync(svgPath);
     
     await sharp(svgBuffer)
@@ -22,6 +27,7 @@ async function convertFaviconToPng() {
     console.log('Favicon successfully converted to PNG!');
   } catch (error) {
     console.error('Error converting favicon to PNG:', error);
+    console.error('Full error:', error.stack);
   }
 }
 
