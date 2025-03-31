@@ -70,16 +70,16 @@ export function Navbar() {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               {navLinks.map((link) => (
-                <Link key={link.href} href={link.href}>
-                  <a
-                    className={`${
-                      isActive(link.href)
-                        ? "border-primary-500 text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                    } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full`}
-                  >
-                    {link.label}
-                  </a>
+                <Link 
+                  key={link.href} 
+                  href={link.href}
+                  className={`${
+                    isActive(link.href)
+                      ? "border-primary-500 text-gray-900"
+                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full`}
+                >
+                  {link.label}
                 </Link>
               ))}
             </div>
@@ -103,15 +103,17 @@ export function Navbar() {
               </DropdownMenu>
             ) : (
               <>
-                <Link href="/auth">
-                  <a className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
-                    Login
-                  </a>
+                <Link 
+                  href="/auth"
+                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
+                >
+                  Login
                 </Link>
-                <Link href="/auth?tab=register">
-                  <a className="bg-primary-500 text-white hover:bg-primary-600 px-4 py-2 rounded-md text-sm font-medium">
-                    Register
-                  </a>
+                <Link 
+                  href="/auth?tab=register"
+                  className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
+                >
+                  Register
                 </Link>
               </>
             )}
@@ -139,17 +141,17 @@ export function Navbar() {
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
             {navLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
-                <a
-                  className={`${
-                    isActive(link.href)
-                      ? "bg-primary-50 border-primary-500 text-primary-700"
-                      : "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
-                  } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  {link.label}
-                </a>
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className={`${
+                  isActive(link.href)
+                    ? "bg-primary-50 border-primary-500 text-primary-700"
+                    : "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
+                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
               </Link>
             ))}
           </div>
@@ -177,21 +179,19 @@ export function Navbar() {
               </div>
             ) : (
               <div className="space-y-1 px-4">
-                <Link href="/auth">
-                  <a
-                    className="block text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Login
-                  </a>
+                <Link 
+                  href="/auth"
+                  className="block text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login
                 </Link>
-                <Link href="/auth?tab=register">
-                  <a
-                    className="block text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    Register
-                  </a>
+                <Link 
+                  href="/auth?tab=register"
+                  className="block text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Register
                 </Link>
               </div>
             )}
