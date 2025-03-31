@@ -50,6 +50,11 @@ export const students = pgTable("students", {
   semester: text("semester").notNull(),
   collegeId: integer("college_id").notNull(),
   photoUrl: text("photo_url"),
+  // Document verification
+  idCardUrl: text("id_card_url"),
+  addressProofUrl: text("address_proof_url"),
+  documentsVerified: boolean("documents_verified").default(false),
+  verificationNotes: text("verification_notes"),
 });
 
 // Define colleges table
@@ -135,6 +140,9 @@ export const studentRegistrationSchema = z.object({
   department: z.string().min(1, "Department is required"),
   semester: z.string().min(1, "Semester is required"),
   collegeId: z.number().min(1, "College is required"),
+  photoUrl: z.string().optional(),
+  idCardUrl: z.string().optional(),
+  addressProofUrl: z.string().optional(),
 });
 
 // Payment submission schema
@@ -145,6 +153,18 @@ export const paymentSubmissionSchema = z.object({
   accountHolder: z.string().min(1, "Account holder name is required"),
   amount: z.number().min(1, "Amount is required"),
   paymentMethod: z.string().min(1, "Payment method is required"),
+});
+
+// Document upload schema
+export const documentUploadSchema = z.object({
+  documentType: z.enum(["idCard", "addressProof", "photo"]),
+  documentUrl: z.string().min(1, "Document URL is required"),
+});
+
+// Document verification schema
+export const documentVerificationSchema = z.object({
+  documentsVerified: z.boolean(),
+  verificationNotes: z.string().optional(),
 });
 
 // Export types
@@ -162,3 +182,5 @@ export type Application = typeof applications.$inferSelect;
 
 export type StudentRegistration = z.infer<typeof studentRegistrationSchema>;
 export type PaymentSubmission = z.infer<typeof paymentSubmissionSchema>;
+export type DocumentUpload = z.infer<typeof documentUploadSchema>;
+export type DocumentVerification = z.infer<typeof documentVerificationSchema>;

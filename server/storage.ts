@@ -1,12 +1,14 @@
-import { applications, colleges, depots, students, users } from "@shared/schema";
+import { applications, colleges, depots, students, users, ApplicationStatus } from "@shared/schema";
 import type { 
   User, InsertUser, 
   Student, InsertStudent, 
   College, InsertCollege, 
   Depot, InsertDepot, 
   Application, InsertApplication,
-  UserType, ApplicationStatus, PaymentDetails
+  UserType, PaymentDetails,
+  DocumentUpload, DocumentVerification
 } from "@shared/schema";
+import { MongoDBStorage } from "./db/MongoDBStorage";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -23,6 +25,8 @@ export interface IStorage {
   getStudent(id: number): Promise<Student | undefined>;
   getStudentByUserId(userId: number): Promise<Student | undefined>;
   createStudent(student: InsertStudent): Promise<Student>;
+  updateStudentDocument(studentId: number, documentType: string, documentUrl: string): Promise<Student | undefined>;
+  verifyStudentDocuments(studentId: number, verified: boolean, notes?: string): Promise<Student | undefined>;
   
   // College operations
   getCollege(id: number): Promise<College | undefined>;
@@ -44,7 +48,7 @@ export interface IStorage {
   updateApplicationPayment(id: number, paymentDetails: PaymentDetails): Promise<Application | undefined>;
   
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
 }
 
 export class MemStorage implements IStorage {
@@ -54,7 +58,7 @@ export class MemStorage implements IStorage {
   private depots: Map<number, Depot>;
   private applications: Map<number, Application>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: session.Store;
   
   currentUserId: number;
   currentStudentId: number;
@@ -185,6 +189,46 @@ export class MemStorage implements IStorage {
     return student;
   }
   
+  async updateStudentDocument(studentId: number, documentType: string, documentUrl: string): Promise<Student | undefined> {
+    const student = this.students.get(studentId);
+    if (!student) return undefined;
+    
+    const updatedStudent = { ...student };
+    
+    // Update the appropriate document field based on type
+    switch (documentType) {
+      case 'idCard':
+        updatedStudent.idCardUrl = documentUrl;
+        break;
+      case 'addressProof':
+        updatedStudent.addressProofUrl = documentUrl;
+        break;
+      case 'photo':
+        updatedStudent.photoUrl = documentUrl;
+        break;
+      default:
+        // Unknown document type, don't update anything
+        break;
+    }
+    
+    this.students.set(studentId, updatedStudent);
+    return updatedStudent;
+  }
+  
+  async verifyStudentDocuments(studentId: number, verified: boolean, notes?: string): Promise<Student | undefined> {
+    const student = this.students.get(studentId);
+    if (!student) return undefined;
+    
+    const updatedStudent = { 
+      ...student, 
+      documentsVerified: verified,
+      verificationNotes: notes || null
+    };
+    
+    this.students.set(studentId, updatedStudent);
+    return updatedStudent;
+  }
+  
   // College operations
   async getCollege(id: number): Promise<College | undefined> {
     return this.colleges.get(id);
@@ -311,4 +355,9 @@ export class MemStorage implements IStorage {
   }
 }
 
+// Use in-memory storage in development, MongoDB in production
+// Uncomment the following line to use MongoDB storage:
+// export const storage = new MongoDBStorage();
+
+// For now, we'll stick with in-memory storage for development and testing:
 export const storage = new MemStorage();

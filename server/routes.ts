@@ -6,7 +6,9 @@ import {
   ApplicationStatus, 
   UserType, 
   insertApplicationSchema, 
-  paymentSubmissionSchema 
+  paymentSubmissionSchema,
+  documentUploadSchema,
+  documentVerificationSchema
 } from "@shared/schema";
 import { ZodError } from "zod";
 
@@ -253,6 +255,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.status(400).json({ message: "Invalid payment data", errors: error.errors });
       } else {
         res.status(500).json({ message: "Failed to submit payment details" });
+      }
+    }
+  });
+
+  // POST /api/student/documents - Upload student document
+  app.post("/api/student/documents", isAuthenticated, hasRole(UserType.STUDENT), async (req, res) => {
+    try {
+      // Validate document upload data
+      const documentData = documentUploadSchema.parse(req.body);
+      
+      // Get student profile
+      const student = await storage.getStudentByUserId(req.user.id);
+      if (!student) {
+        return res.status(404).json({ message: "Student profile not found" });
+      }
+      
+      // Update student document
+      const updatedStudent = await storage.updateStudentDocument(
+        student.id,
+        documentData.documentType,
+        documentData.documentUrl
+      );
+      
+      res.json(updatedStudent);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: "Invalid document data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to upload document" });
+      }
+    }
+  });
+  
+  // POST /api/student/:id/verify-documents - Verify student documents (college only)
+  app.post("/api/student/:id/verify-documents", isAuthenticated, hasRole(UserType.COLLEGE), async (req, res) => {
+    try {
+      // Validate document verification data
+      const verificationData = documentVerificationSchema.parse(req.body);
+      
+      const studentId = parseInt(req.params.id);
+      
+      // Get student
+      const student = await storage.getStudent(studentId);
+      if (!student) {
+        return res.status(404).json({ message: "Student not found" });
+      }
+      
+      // Check if college has permission
+      if (student.collegeId !== req.user.collegeId) {
+        return res.status(403).json({ message: "Forbidden: Student not affiliated with your college" });
+      }
+      
+      // Verify student documents
+      const updatedStudent = await storage.verifyStudentDocuments(
+        studentId,
+        verificationData.documentsVerified,
+        verificationData.verificationNotes
+      );
+      
+      res.json(updatedStudent);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        res.status(400).json({ message: "Invalid verification data", errors: error.errors });
+      } else {
+        res.status(500).json({ message: "Failed to verify documents" });
       }
     }
   });
