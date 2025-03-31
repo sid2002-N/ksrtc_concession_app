@@ -41,7 +41,7 @@ export default function AuthPage() {
   const defaultTab = searchParams.get("tab") === "register" ? "register" : "login";
   const [activeTab, setActiveTab] = useState(defaultTab);
   const [registrationType, setRegistrationType] = useState("student");
-  
+
   const { data: colleges } = useQuery<any[]>({
     queryKey: ["/api/colleges"],
   });
@@ -101,7 +101,7 @@ export default function AuthPage() {
       terms: false,
     },
   });
-  
+
   // College registration form setup
   const collegeRegSchema = collegeRegistrationSchema.extend({
     confirmPassword: z.string(),
@@ -128,7 +128,7 @@ export default function AuthPage() {
       terms: false,
     },
   });
-  
+
   // Depot registration form setup
   const depotRegSchema = depotRegistrationSchema.extend({
     confirmPassword: z.string(),
@@ -170,23 +170,23 @@ export default function AuthPage() {
   const onStudentRegisterSubmit = (data: any) => {
     // Remove terms and confirmPassword as they're not part of the API
     const { terms, confirmPassword, ...registrationData } = data;
-    
+
     // Convert collegeId from string to number if needed
     const formattedData = {
       ...registrationData,
       collegeId: Number(registrationData.collegeId),
     };
-    
+
     registerStudentMutation.mutate(formattedData);
   };
-  
+
   // Handle college registration form submission
   const onCollegeRegisterSubmit = (data: any) => {
     // Remove terms and confirmPassword as they're not part of the API
     const { terms, confirmPassword, ...registrationData } = data;
     registerCollegeMutation.mutate(registrationData);
   };
-  
+
   // Handle depot registration form submission
   const onDepotRegisterSubmit = (data: any) => {
     // Remove terms and confirmPassword as they're not part of the API
@@ -205,7 +205,7 @@ export default function AuthPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-grow py-12 bg-gray-50">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="bg-white shadow overflow-hidden sm:rounded-lg">
@@ -310,7 +310,7 @@ export default function AuthPage() {
                     <h3 className="text-lg font-medium leading-6 text-gray-900">Registration</h3>
                     <p className="mt-1 text-sm text-gray-500">Choose your registration type below.</p>
                   </div>
-                  
+
                   {/* Registration type selector */}
                   <div className="border-b border-gray-200 mb-4">
                     <div className="flex justify-center">
@@ -323,7 +323,7 @@ export default function AuthPage() {
                       </Tabs>
                     </div>
                   </div>
-                  
+
                   {/* Student registration form */}
                   {registrationType === "student" && (
                     <div>
@@ -331,7 +331,7 @@ export default function AuthPage() {
                         <h4 className="text-md font-medium leading-6 text-gray-900">Student Registration</h4>
                         <p className="mt-1 text-sm text-gray-500">Create an account to apply for concession pass.</p>
                       </div>
-                      
+
                       <Form {...studentRegForm}>
                         <form onSubmit={studentRegForm.handleSubmit(onStudentRegisterSubmit)} className="space-y-6">
                           <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
@@ -530,13 +530,13 @@ export default function AuthPage() {
                             <FormField
                               control={studentRegForm.control}
                               name="username"
-                              render={({ field }) => (
+                              render={({ field, fieldState: {error} }) => (
                                 <FormItem>
                                   <FormLabel>Username</FormLabel>
                                   <FormControl>
-                                    <Input {...field} />
+                                    <Input {...field} className={`mt-1 block w-full rounded-md shadow-sm ${error ? 'border-red-500' : 'border-gray-300'}`} />
                                   </FormControl>
-                                  <FormMessage />
+                                  {error && <FormMessage>{error.message}</FormMessage>}
                                 </FormItem>
                               )}
                             />
@@ -567,7 +567,7 @@ export default function AuthPage() {
                               )}
                             />
                           </div>
-                          
+
                           <FormField
                             control={studentRegForm.control}
                             name="terms"
@@ -589,7 +589,7 @@ export default function AuthPage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           <Button 
                             type="submit" 
                             className="w-full"
@@ -606,7 +606,7 @@ export default function AuthPage() {
                       </Form>
                     </div>
                   )}
-                  
+
                   {/* College registration form */}
                   {registrationType === "college" && (
                     <div>
@@ -614,7 +614,7 @@ export default function AuthPage() {
                         <h4 className="text-md font-medium leading-6 text-gray-900">College Registration</h4>
                         <p className="mt-1 text-sm text-gray-500">Register your college to verify student applications.</p>
                       </div>
-                      
+
                       <Form {...collegeRegForm}>
                         <form onSubmit={collegeRegForm.handleSubmit(onCollegeRegisterSubmit)} className="space-y-6">
                           <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
@@ -736,7 +736,7 @@ export default function AuthPage() {
                               )}
                             />
                           </div>
-                          
+
                           <FormField
                             control={collegeRegForm.control}
                             name="terms"
@@ -758,7 +758,7 @@ export default function AuthPage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           <Button 
                             type="submit" 
                             className="w-full"
@@ -775,7 +775,7 @@ export default function AuthPage() {
                       </Form>
                     </div>
                   )}
-                  
+
                   {/* Depot registration form */}
                   {registrationType === "depot" && (
                     <div>
@@ -783,7 +783,7 @@ export default function AuthPage() {
                         <h4 className="text-md font-medium leading-6 text-gray-900">KSRTC Depot Registration</h4>
                         <p className="mt-1 text-sm text-gray-500">Register your depot to manage concession applications.</p>
                       </div>
-                      
+
                       <Form {...depotRegForm}>
                         <form onSubmit={depotRegForm.handleSubmit(onDepotRegisterSubmit)} className="space-y-6">
                           <div className="grid grid-cols-1 gap-y-4 gap-x-4 sm:grid-cols-2">
@@ -905,7 +905,7 @@ export default function AuthPage() {
                               )}
                             />
                           </div>
-                          
+
                           <FormField
                             control={depotRegForm.control}
                             name="terms"
@@ -927,7 +927,7 @@ export default function AuthPage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           <Button 
                             type="submit" 
                             className="w-full"
@@ -950,7 +950,7 @@ export default function AuthPage() {
           </Card>
         </div>
       </main>
-      
+
       <Footer />
     </div>
   );

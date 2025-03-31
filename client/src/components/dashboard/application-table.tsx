@@ -30,7 +30,7 @@ interface ApplicationTableProps {
 export function ApplicationTable({ userType, applications, readOnly = false }: ApplicationTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterValue, setFilterValue] = useState("all");
-  
+
   const getStatusBadge = (status: ApplicationStatus) => {
     switch (status) {
       case ApplicationStatus.PENDING:
@@ -53,22 +53,41 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
         return <Badge>Unknown</Badge>;
     }
   };
-  
+
   // Filter applications based on search term and filter value
   const filteredApplications = applications.filter(app => {
     // Filter by status if filter value is not 'all'
     if (filterValue !== "all" && app.status !== filterValue) {
       return false;
     }
-    
+
     // For now, simple contains search on application ID
     if (searchTerm && !app.id.toString().includes(searchTerm)) {
       return false;
     }
-    
+
     return true;
   });
-  
+
+  //Added loading state handling.
+  const loadingApplications = filteredApplications.map(app => {
+    const { data: student, isLoading } = useQuery({
+      queryKey: [`/api/students/${app.studentId}`],
+    });
+
+    return { ...app, student, isLoading };
+  });
+
+  const isLoading = loadingApplications.some(app => app.isLoading);
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="mb-5 flex flex-col sm:flex-row justify-between items-center gap-4">
@@ -141,22 +160,17 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                 </TableCell>
               </TableRow>
             ) : (
-              filteredApplications.map((application) => {
-                // Custom fetch for student details
-                const { data: student } = useQuery({
-                  queryKey: [`/api/students/${application.studentId}`],
-                });
-                
+              loadingApplications.map((application) => {
                 return (
                   <TableRow key={application.id}>
                     <TableCell className="font-medium">
                       KSRTC-{new Date(application.applicationDate).getFullYear()}-{application.id}
                     </TableCell>
                     <TableCell>
-                      {student ? (
+                      {application.student ? (
                         <div>
-                          <div className="font-medium">{student.firstName} {student.lastName}</div>
-                          <div className="text-sm text-gray-500">ID: {student.collegeIdNumber}</div>
+                          <div className="font-medium">{application.student.firstName} {application.student.lastName}</div>
+                          <div className="text-sm text-gray-500">ID: {application.student.collegeIdNumber}</div>
                         </div>
                       ) : (
                         "Loading..."
@@ -186,7 +200,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                           </Link>
                         </div>
                       )}
-                      
+
                       {!readOnly && userType === "depot" && application.status === ApplicationStatus.COLLEGE_VERIFIED && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/depot/approve/${application.id}`}>
@@ -201,7 +215,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                           </Link>
                         </div>
                       )}
-                      
+
                       {!readOnly && userType === "depot" && application.status === ApplicationStatus.PAYMENT_PENDING && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/depot/approve/${application.id}?action=verify-payment`}>
@@ -211,7 +225,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                           </Link>
                         </div>
                       )}
-                      
+
                       {!readOnly && userType === "depot" && application.status === ApplicationStatus.PAYMENT_VERIFIED && (
                         <div className="flex justify-end gap-2">
                           <Link href={`/depot/approve/${application.id}?action=issue`}>
@@ -221,7 +235,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                           </Link>
                         </div>
                       )}
-                      
+
                       {userType === "depot" && application.status === ApplicationStatus.ISSUED && (
                         <div className="flex justify-end">
                           <Link href={`/depot/approve/${application.id}?action=download`}>
@@ -231,7 +245,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                           </Link>
                         </div>
                       )}
-                      
+
                       <Link href={userType === "college" ? `/college/verify/${application.id}?action=view` : `/depot/approve/${application.id}?action=view`}>
                         <Button size="sm" variant="ghost" className="text-primary-600 hover:text-primary-900">
                           View
@@ -245,7 +259,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
           </TableBody>
         </Table>
       </div>
-      
+
       {/* Pagination */}
       <div className="mt-4 bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-lg">
         <div className="flex-1 flex justify-between sm:hidden">
