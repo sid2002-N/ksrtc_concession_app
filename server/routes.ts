@@ -14,6 +14,10 @@ import {
   sendStatusNotification, 
   initializeScheduledNotifications 
 } from './services/notification.service';
+import {
+  generateConcessionPDF,
+  issueConcessionPass
+} from './services/pdf.service';
 import { ZodError } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -372,6 +376,106 @@ export async function registerRoutes(app: Express): Promise<Server> {
       } else {
         res.status(500).json({ message: "Failed to verify documents" });
       }
+    }
+  });
+
+  // GET /api/applications/:id/concession - Download concession pass PDF
+  app.get("/api/applications/:id/concession", isAuthenticated, async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      
+      // Fetch the application
+      const application = await storage.getApplication(applicationId);
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if user has permission to download this concession
+      if (req.user?.userType === UserType.STUDENT) {
+        const student = await storage.getStudentByUserId(req.user.id);
+        if (!student || application.studentId !== student.id) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      } else if (req.user?.userType === UserType.COLLEGE) {
+        if (application.collegeId !== req.user.collegeId) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      } else if (req.user?.userType === UserType.DEPOT) {
+        if (application.depotId !== req.user.depotId) {
+          return res.status(403).json({ message: "Forbidden" });
+        }
+      }
+      
+      // Check if application is in ISSUED status
+      if (application.status !== ApplicationStatus.ISSUED) {
+        return res.status(400).json({ 
+          message: "Concession pass is not available. Application must be in ISSUED status." 
+        });
+      }
+      
+      // Generate the PDF
+      const pdfBuffer = await generateConcessionPDF(applicationId);
+      
+      // Set response headers
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename=concession-${applicationId}.pdf`);
+      
+      // Send the PDF
+      res.send(pdfBuffer);
+    } catch (error) {
+      console.error('Error generating concession PDF:', error);
+      res.status(500).json({ message: "Failed to generate concession pass" });
+    }
+  });
+  
+  // POST /api/applications/:id/issue - Issue concession pass (depot only)
+  app.post("/api/applications/:id/issue", isAuthenticated, hasRole(UserType.DEPOT), async (req, res) => {
+    try {
+      const applicationId = parseInt(req.params.id);
+      
+      // Fetch the application
+      const application = await storage.getApplication(applicationId);
+      if (!application) {
+        return res.status(404).json({ message: "Application not found" });
+      }
+      
+      // Check if depot has permission
+      if (application.depotId !== req.user?.depotId) {
+        return res.status(403).json({ message: "Forbidden" });
+      }
+      
+      // Check if application is in PAYMENT_VERIFIED status
+      if (application.status !== ApplicationStatus.PAYMENT_VERIFIED) {
+        return res.status(400).json({ 
+          message: "Application must be in PAYMENT_VERIFIED status to issue a concession pass" 
+        });
+      }
+      
+      // Issue the concession pass
+      const issuedApplication = await issueConcessionPass(applicationId);
+      
+      // Get the student's user account to send notification
+      try {
+        const student = await storage.getStudent(application.studentId);
+        if (student) {
+          const studentUser = await storage.getUser(student.userId);
+          if (studentUser) {
+            // Send notification asynchronously (don't await)
+            sendStatusNotification(issuedApplication, studentUser)
+              .catch(err => console.error('Error sending issuance notification:', err));
+            
+            console.log(`Notification queued for application ${applicationId} concession issuance`);
+          }
+        }
+      } catch (notifError) {
+        console.error('Error preparing issuance notification:', notifError);
+        // Don't fail the request if notification fails
+      }
+      
+      res.json(issuedApplication);
+    } catch (error) {
+      console.error('Error issuing concession pass:', error);
+      res.status(500).json({ message: "Failed to issue concession pass" });
     }
   });
 

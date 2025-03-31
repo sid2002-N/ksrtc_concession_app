@@ -35,12 +35,25 @@ export default function DownloadApplication() {
   const isLoading = isLoadingApplication || isLoadingStudent;
 
   const handleDownload = () => {
-    // In a real application, this would be an API call to generate and download a PDF
-    toast({
-      title: "Application Downloaded",
-      description: "The application has been downloaded successfully.",
-      variant: "default",
-    });
+    if (!application) return;
+    
+    try {
+      // Open a new window to download the PDF
+      window.open(`/api/applications/${application.id}/concession`, '_blank');
+      
+      toast({
+        title: "Downloading Concession Pass",
+        description: "Your concession pass is being downloaded.",
+        variant: "default",
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error downloading your concession pass. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -121,13 +134,29 @@ export default function DownloadApplication() {
                   </div>
 
                   <div className="pt-4 border-t border-gray-200">
-                    <Button 
-                      onClick={handleDownload}
-                      className="w-full sm:w-auto flex items-center justify-center gap-2"
-                    >
-                      <Download className="h-4 w-4" />
-                      Download Application PDF
-                    </Button>
+                    {application.status === "issued" ? (
+                      <Button 
+                        onClick={handleDownload}
+                        className="w-full sm:w-auto flex items-center justify-center gap-2"
+                      >
+                        <Download className="h-4 w-4" />
+                        Download Concession Pass
+                      </Button>
+                    ) : (
+                      <div className="space-y-3">
+                        <Button 
+                          disabled
+                          className="w-full sm:w-auto flex items-center justify-center gap-2 opacity-60"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download Concession Pass
+                        </Button>
+                        <p className="text-sm text-amber-600 flex items-center">
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Concession pass will be available after your application is fully processed and issued.
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </CardContent>
