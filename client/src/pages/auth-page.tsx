@@ -158,6 +158,7 @@ export default function AuthPage() {
 
   // Handle login form submission
   const onLoginSubmit = (data: any) => {
+    console.log("Login attempt with:", { username: data.username, userType: data.userType });
     loginMutation.mutate({
       username: data.username,
       password: data.password,

@@ -14,6 +14,7 @@ import type {
 import { MongoDBStorage } from "./db/MongoDBStorage";
 import session from "express-session";
 import createMemoryStore from "memorystore";
+import { hashPassword } from "./auth";
 
 const MemoryStore = createMemoryStore(session);
 
@@ -160,8 +161,10 @@ export class MemStorage implements IStorage {
     // We're using Promise.all with an IIFE to await promises in constructor
     (async () => {
       try {
-        // Add sample users with pre-hashed passwords (all passwords are 'password123')
-        const hashedPassword = "fe8df1b0cb0c0be6207a3b25cbae47adf29ce49125e81e0b13a86d1be6171ade639e75a293e5638c4be17ee7c26aa75504e569e0f1f1431991950986d7943423.a9e40f3c3b3c1145e0fb1e3c9624e6f2";
+        // Add sample users
+        // Get a fresh hash for 'password123' to ensure it works with current hash settings
+        const hashedPassword = await hashPassword("password123");
+        console.log("Created fresh hash for sample users");
         
         // Sample students
         const studentUser = await this.createUser({
@@ -185,9 +188,10 @@ export class MemStorage implements IStorage {
           collegeIdNumber: "GEC20001",
           course: "B.Tech",
           department: "Computer Science",
-          semester: 5,
+          semester: "5",
           photoUrl: null,
-          documentUrl: null,
+          idCardUrl: null,
+          addressProofUrl: null,
           altPhone: null
         });
         

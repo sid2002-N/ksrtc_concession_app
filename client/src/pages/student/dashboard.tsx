@@ -8,7 +8,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Application, Student } from "@shared/schema";
 import { Loader2 } from "lucide-react";
-import { Redirect } from "wouter";
+import { Link, Redirect } from "wouter";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
