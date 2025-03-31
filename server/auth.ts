@@ -72,7 +72,7 @@ export function setupAuth(app: Express) {
   // Register endpoint
   app.post("/api/register", async (req, res, next) => {
     try {
-      const { username, password, email, userType, phone, ...studentData } = req.body;
+      const { username, password, email, userType, phone, ...otherData } = req.body;
       
       // Check if username already exists
       const existingUser = await storage.getUserByUsername(username);
@@ -80,35 +80,71 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Username already exists" });
       }
       
-      // Create user
+      // Create user with appropriate ID fields based on type
       const hashedPassword = await hashPassword(password);
+      let collegeId = null;
+      let depotId = null;
+      
+      if (userType === UserType.STUDENT) {
+        collegeId = otherData.collegeId;
+      }
+      
+      // Create the user account
       const user = await storage.createUser({
         username,
         password: hashedPassword,
         email,
         userType,
         phone,
-        collegeId: studentData.collegeId,
-        depotId: null
+        collegeId,
+        depotId
       });
       
-      // If student, create student profile
+      // Create specific profiles based on user type
       if (userType === UserType.STUDENT) {
         await storage.createStudent({
           userId: user.id,
-          firstName: studentData.firstName,
-          lastName: studentData.lastName,
-          collegeIdNumber: studentData.collegeIdNumber,
-          dateOfBirth: studentData.dateOfBirth,
-          gender: studentData.gender,
-          altPhone: studentData.altPhone,
-          address: studentData.address,
-          course: studentData.course,
-          department: studentData.department,
-          semester: studentData.semester,
-          collegeId: studentData.collegeId,
-          photoUrl: studentData.photoUrl
+          firstName: otherData.firstName,
+          lastName: otherData.lastName,
+          collegeIdNumber: otherData.collegeIdNumber,
+          dateOfBirth: otherData.dateOfBirth,
+          gender: otherData.gender,
+          altPhone: otherData.altPhone,
+          address: otherData.address,
+          course: otherData.course,
+          department: otherData.department,
+          semester: otherData.semester,
+          collegeId: otherData.collegeId,
+          photoUrl: otherData.photoUrl
         });
+      } else if (userType === UserType.COLLEGE) {
+        // Create college profile
+        const college = await storage.createCollege({
+          name: otherData.name,
+          address: otherData.address,
+          district: otherData.district,
+          contactPerson: otherData.contactPerson,
+          phone,
+          email,
+          userId: user.id
+        });
+        
+        // Update user with collegeId
+        await storage.updateUser(user.id, { collegeId: college.id });
+      } else if (userType === UserType.DEPOT) {
+        // Create depot profile
+        const depot = await storage.createDepot({
+          name: otherData.name,
+          location: otherData.location,
+          address: otherData.address,
+          contactPerson: otherData.contactPerson,
+          phone,
+          email,
+          userId: user.id
+        });
+        
+        // Update user with depotId
+        await storage.updateUser(user.id, { depotId: depot.id });
       }
 
       // Login the user

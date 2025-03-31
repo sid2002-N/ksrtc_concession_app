@@ -145,6 +145,30 @@ export const studentRegistrationSchema = z.object({
   addressProofUrl: z.string().optional(),
 });
 
+// College registration schema
+export const collegeRegistrationSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  name: z.string().min(1, "College name is required"),
+  address: z.string().min(1, "Address is required"),
+  district: z.string().min(1, "District is required"),
+  contactPerson: z.string().min(1, "Contact person name is required"),
+});
+
+// Depot registration schema
+export const depotRegistrationSchema = z.object({
+  username: z.string().min(3, "Username must be at least 3 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email("Invalid email address"),
+  phone: z.string().min(10, "Phone number must be at least 10 digits"),
+  name: z.string().min(1, "Depot name is required"),
+  location: z.string().min(1, "Location is required"),
+  address: z.string().min(1, "Address is required"),
+  contactPerson: z.string().min(1, "Contact person name is required"),
+});
+
 // Payment submission schema
 export const paymentSubmissionSchema = z.object({
   applicationId: z.number(),
@@ -181,6 +205,8 @@ export type Depot = typeof depots.$inferSelect;
 export type Application = typeof applications.$inferSelect;
 
 export type StudentRegistration = z.infer<typeof studentRegistrationSchema>;
+export type CollegeRegistration = z.infer<typeof collegeRegistrationSchema>;
+export type DepotRegistration = z.infer<typeof depotRegistrationSchema>;
 export type PaymentSubmission = z.infer<typeof paymentSubmissionSchema>;
 export type DocumentUpload = z.infer<typeof documentUploadSchema>;
 export type DocumentVerification = z.infer<typeof documentVerificationSchema>;

@@ -52,6 +52,15 @@ export class MongoDBStorage implements IStorage {
     await newUser.save();
     return documentToType<UserType, IUser>(newUser)!;
   }
+  
+  async updateUser(id: number, updates: Partial<UserType>): Promise<UserType | undefined> {
+    const user = await User.findByIdAndUpdate(
+      id, 
+      updates, 
+      { new: true }
+    );
+    return documentToType<UserType, IUser>(user);
+  }
 
   // Student operations
   async getStudent(id: number): Promise<StudentType | undefined> {

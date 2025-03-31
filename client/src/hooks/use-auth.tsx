@@ -4,7 +4,13 @@ import {
   useMutation,
   UseMutationResult,
 } from "@tanstack/react-query";
-import { insertUserSchema, User, UserType, StudentRegistration } from "@shared/schema";
+import { 
+  User, 
+  UserType, 
+  StudentRegistration, 
+  CollegeRegistration, 
+  DepotRegistration 
+} from "@shared/schema";
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +21,8 @@ type AuthContextType = {
   loginMutation: UseMutationResult<User, Error, LoginData>;
   logoutMutation: UseMutationResult<void, Error, void>;
   registerStudentMutation: UseMutationResult<User, Error, StudentRegistration>;
+  registerCollegeMutation: UseMutationResult<User, Error, CollegeRegistration>;
+  registerDepotMutation: UseMutationResult<User, Error, DepotRegistration>;
 };
 
 type LoginData = {
@@ -92,6 +100,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
   });
+  
+  const registerCollegeMutation = useMutation({
+    mutationFn: async (data: CollegeRegistration) => {
+      const res = await apiRequest("POST", "/api/register", {
+        ...data,
+        userType: UserType.COLLEGE,
+      });
+      return await res.json();
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      
+      // Navigate to college dashboard
+      window.location.href = "/college/dashboard";
+      
+      toast({
+        title: "College Registration Successful",
+        description: "Your college has been registered successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "College Registration Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  const registerDepotMutation = useMutation({
+    mutationFn: async (data: DepotRegistration) => {
+      const res = await apiRequest("POST", "/api/register", {
+        ...data,
+        userType: UserType.DEPOT,
+      });
+      return await res.json();
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      
+      // Navigate to depot dashboard
+      window.location.href = "/depot/dashboard";
+      
+      toast({
+        title: "Depot Registration Successful",
+        description: "Your KSRTC depot has been registered successfully.",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Depot Registration Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
@@ -126,6 +190,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerStudentMutation,
+        registerCollegeMutation,
+        registerDepotMutation,
       }}
     >
       {children}

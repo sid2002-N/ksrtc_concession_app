@@ -83,7 +83,18 @@ export default function StudentPayment() {
   // Redirect if application is not in the right status
   if (!isLoading && application && application.status !== ApplicationStatus.DEPOT_APPROVED) {
     navigate(`/student/track/${id}`);
-    return null;
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-grow py-12 bg-gray-50">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-primary-500 mx-auto" />
+            <p className="mt-4">Redirecting to application tracking page...</p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

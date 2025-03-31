@@ -15,6 +15,7 @@ import CollegeDashboard from "@/pages/college/dashboard";
 import CollegeVerify from "@/pages/college/verify";
 import DepotDashboard from "@/pages/depot/dashboard";
 import DepotApprove from "@/pages/depot/approve";
+import { UserType } from "@shared/schema";
 
 function Router() {
   return (
@@ -26,18 +27,18 @@ function Router() {
       <Route path="/faq" component={FaqPage} />
       
       {/* Student Routes */}
-      <ProtectedRoute path="/student/dashboard" component={StudentDashboard} userType="student" />
-      <ProtectedRoute path="/student/apply" component={StudentApply} userType="student" />
-      <ProtectedRoute path="/student/track/:id" component={StudentTrack} userType="student" />
-      <ProtectedRoute path="/student/payment/:id" component={StudentPayment} userType="student" />
+      <ProtectedRoute path="/student/dashboard" component={StudentDashboard} userType={UserType.STUDENT} />
+      <ProtectedRoute path="/student/apply" component={StudentApply} userType={UserType.STUDENT} />
+      <ProtectedRoute path="/student/track/:id" component={StudentTrack} userType={UserType.STUDENT} />
+      <ProtectedRoute path="/student/payment/:id" component={StudentPayment} userType={UserType.STUDENT} />
       
       {/* College Routes */}
-      <ProtectedRoute path="/college/dashboard" component={CollegeDashboard} userType="college" />
-      <ProtectedRoute path="/college/verify/:id" component={CollegeVerify} userType="college" />
+      <ProtectedRoute path="/college/dashboard" component={CollegeDashboard} userType={UserType.COLLEGE} />
+      <ProtectedRoute path="/college/verify/:id" component={CollegeVerify} userType={UserType.COLLEGE} />
       
       {/* Depot Routes */}
-      <ProtectedRoute path="/depot/dashboard" component={DepotDashboard} userType="depot" />
-      <ProtectedRoute path="/depot/approve/:id" component={DepotApprove} userType="depot" />
+      <ProtectedRoute path="/depot/dashboard" component={DepotDashboard} userType={UserType.DEPOT} />
+      <ProtectedRoute path="/depot/approve/:id" component={DepotApprove} userType={UserType.DEPOT} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />
