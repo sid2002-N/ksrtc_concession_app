@@ -42,6 +42,7 @@ export function Navbar() {
     } else if (user.userType === UserType.DEPOT) {
       navLinks = [
         { href: "/depot/dashboard", label: "Dashboard" },
+        { href: "/admin/analytics", label: "Analytics" }, // Added analytics link
         ...navLinks,
       ];
     }
