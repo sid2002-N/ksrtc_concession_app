@@ -20,7 +20,10 @@ export default function DepotStats() {
     );
   }
 
-  if (!depotStats || depotStats.length === 0) {
+  // Add nullish coalescing operator to handle potential undefined values
+  const depotStatsLength = depotStats?.length ?? 0;
+
+  if (depotStatsLength === 0) {
     return (
       <div className="p-4 text-muted-foreground">
         No depot statistics available

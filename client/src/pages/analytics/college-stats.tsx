@@ -20,7 +20,8 @@ export default function CollegeStats() {
     );
   }
 
-  if (!collegeStats || collegeStats.length === 0) {
+  // Added null check for collegeStats and its length
+  if (!collegeStats || collegeStats?.length === 0) {
     return (
       <div className="p-4 text-muted-foreground">
         No college statistics available
