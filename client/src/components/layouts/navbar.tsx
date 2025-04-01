@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
@@ -18,7 +19,6 @@ export function Navbar() {
   const { user, logoutMutation } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Determine nav links based on user type
   let navLinks = [
     { href: "/", label: "Home" },
     { href: "/about", label: "About" },
@@ -26,7 +26,6 @@ export function Navbar() {
     { href: "/faq", label: "FAQ" },
   ];
 
-  // Add dashboard link if user is logged in
   if (user) {
     if (user.userType === UserType.STUDENT) {
       navLinks = [
@@ -42,7 +41,7 @@ export function Navbar() {
     } else if (user.userType === UserType.DEPOT) {
       navLinks = [
         { href: "/depot/dashboard", label: "Dashboard" },
-        { href: "/admin/analytics", label: "Analytics" }, // Added analytics link
+        { href: "/admin/analytics", label: "Analytics" },
         ...navLinks,
       ];
     }
@@ -51,86 +50,83 @@ export function Navbar() {
   const isActive = (href: string) => location === href;
 
   return (
-    <nav className="bg-white shadow relative">
+    <nav className="bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <div className="flex items-center cursor-pointer">
-                  <svg className="h-10 w-10 text-primary-500" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 4H4V9H9V4Z" fill="currentColor" />
-                    <path d="M9 15H4V20H9V15Z" fill="currentColor" />
-                    <path d="M20 4H15V9H20V4Z" fill="currentColor" />
-                    <path d="M20 15H15V20H20V15Z" fill="currentColor" />
-                    <path d="M4 9H20V15H4V9Z" fill="currentColor" />
-                  </svg>
-                  <span className="ml-2 font-semibold text-primary-500 text-lg">KSRTC Online Concession</span>
-                </div>
-              </Link>
-            </div>
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+          <div className="flex items-center">
+            <Link href="/">
+              <div className="flex items-center cursor-pointer">
+                <svg className="h-8 w-8 text-primary-500" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 4H4V9H9V4Z" fill="currentColor" />
+                  <path d="M9 15H4V20H9V15Z" fill="currentColor" />
+                  <path d="M20 4H15V9H20V4Z" fill="currentColor" />
+                  <path d="M20 15H15V20H20V15Z" fill="currentColor" />
+                  <path d="M4 9H20V15H4V9Z" fill="currentColor" />
+                </svg>
+                <span className="ml-2 text-lg font-semibold text-gray-900 hidden sm:block">KSRTC Concession</span>
+              </div>
+            </Link>
+          </div>
+
+          {/* Desktop Navigation */}
+          <div className="hidden sm:flex sm:items-center sm:space-x-4">
+            <div className="flex space-x-4">
               {navLinks.map((link) => (
                 <Link 
                   key={link.href} 
                   href={link.href}
                   className={`${
                     isActive(link.href)
-                      ? "border-primary-500 text-gray-900"
-                      : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
-                  } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium h-full`}
+                      ? "text-primary-600 border-b-2 border-primary-600"
+                      : "text-gray-500 hover:text-gray-700"
+                  } px-3 py-2 text-sm font-medium transition-colors duration-150`}
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
+            
+            <div className="ml-4 flex items-center">
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="text-gray-600">
+                      {user.username} <span className="ml-2 text-xs opacity-50">{user.userType}</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="flex space-x-2">
+                  <Link href="/auth">
+                    <Button variant="ghost">Login</Button>
+                  </Link>
+                  <Link href="/auth?tab=register">
+                    <Button>Register</Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-4">
-            {user ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="text-gray-600">
-                    {user.username} <span className="ml-2 text-xs opacity-50">{user.userType}</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => logoutMutation.mutate()}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <>
-                <Link 
-                  href="/auth"
-                  className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Login
-                </Link>
-                <Link 
-                  href="/auth?tab=register"
-                  className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md text-sm font-medium"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </div>
-          <div className="-mr-2 flex items-center sm:hidden">
+
+          {/* Mobile menu button */}
+          <div className="flex items-center sm:hidden">
             <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500"
-              aria-expanded="false"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary-500 transition-colors duration-150"
             >
               <span className="sr-only">Open main menu</span>
               {mobileMenuOpen ? (
-                <X className="block h-6 w-6" aria-hidden="true" />
+                <X className="block h-6 w-6" />
               ) : (
-                <Menu className="block h-6 w-6" aria-hidden="true" />
+                <Menu className="block h-6 w-6" />
               )}
             </button>
           </div>
@@ -138,26 +134,24 @@ export function Navbar() {
       </div>
 
       {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="sm:hidden">
-          <div className="pt-2 pb-3 space-y-1">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href} 
-                href={link.href}
-                className={`${
-                  isActive(link.href)
-                    ? "bg-primary-50 border-primary-500 text-primary-700"
-                    : "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
-                } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-200">
-            {user ? (
+      <div className={`${mobileMenuOpen ? 'block' : 'hidden'} sm:hidden`}>
+        <div className="pt-2 pb-3 space-y-1 bg-white shadow-lg rounded-b-lg">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={`${
+                isActive(link.href)
+                  ? "bg-primary-50 border-primary-500 text-primary-700"
+                  : "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700"
+              } block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-150`}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {user ? (
+            <div className="border-t border-gray-200 pt-4 pb-3">
               <div className="flex items-center px-4">
                 <div className="flex-shrink-0">
                   <div className="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
@@ -168,37 +162,45 @@ export function Navbar() {
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-gray-800">{user.username}</div>
-                  <div className="text-sm font-medium text-gray-500">{user.email}</div>
+                  <div className="text-sm font-medium text-gray-500">{user.userType}</div>
                 </div>
                 <Button
                   variant="ghost"
                   className="ml-auto flex-shrink-0 p-1 rounded-full text-gray-400 hover:text-gray-500"
-                  onClick={() => logoutMutation.mutate()}
+                  onClick={() => {
+                    logoutMutation.mutate();
+                    setMobileMenuOpen(false);
+                  }}
                 >
-                  <LogOut className="h-6 w-6" aria-hidden="true" />
+                  <LogOut className="h-6 w-6" />
                 </Button>
               </div>
-            ) : (
+            </div>
+          ) : (
+            <div className="pt-4 pb-3 border-t border-gray-200">
               <div className="space-y-1 px-4">
-                <Link 
-                  href="/auth"
-                  className="block text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Login
+                <Link href="/auth">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start text-left"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Login
+                  </Button>
                 </Link>
-                <Link 
-                  href="/auth?tab=register"
-                  className="block text-gray-500 hover:bg-gray-100 px-3 py-2 rounded-md text-base font-medium"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Register
+                <Link href="/auth?tab=register">
+                  <Button
+                    className="w-full justify-start text-left"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Register
+                  </Button>
                 </Link>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </nav>
   );
 }
