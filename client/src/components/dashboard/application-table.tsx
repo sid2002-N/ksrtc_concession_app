@@ -186,18 +186,29 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                       {new Date(application.applicationDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      {!readOnly && userType === "college" && application.status === ApplicationStatus.PENDING && (
+                      {!readOnly && userType === "college" && (
                         <div className="flex justify-end gap-2">
-                          <Link href={`/college/verify/${application.id}`}>
-                            <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
-                              Verify
-                            </Button>
-                          </Link>
-                          <Link href={`/college/verify/${application.id}?action=reject`}>
-                            <Button size="sm" variant="outline" className="text-red-600 hover:text-red-900 border-red-200 hover:bg-red-50">
-                              Reject
-                            </Button>
-                          </Link>
+                          {application.status === ApplicationStatus.PENDING && (
+                            <>
+                              <Link href={`/college/verify/${application.id}`}>
+                                <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
+                                  Verify
+                                </Button>
+                              </Link>
+                              <Link href={`/college/verify/${application.id}?action=reject`}>
+                                <Button size="sm" variant="outline" className="text-red-600 hover:text-red-900 border-red-200 hover:bg-red-50">
+                                  Reject
+                                </Button>
+                              </Link>
+                            </>
+                          )}
+                          {[ApplicationStatus.COLLEGE_VERIFIED, ApplicationStatus.DEPOT_APPROVED, ApplicationStatus.PAYMENT_VERIFIED, ApplicationStatus.ISSUED].includes(application.status) && (
+                            <Link href={`/college/verify/${application.id}?action=view`}>
+                              <Button size="sm" variant="outline" className="text-blue-600 hover:text-blue-900 border-blue-200 hover:bg-blue-50">
+                                View Details
+                              </Button>
+                            </Link>
+                          )}
                         </div>
                       )}
 

@@ -236,6 +236,34 @@ export default function CollegeVerify() {
                     Verify and Approve
                   </Button>
                 </div>
+              ) : application.status === ApplicationStatus.COLLEGE_VERIFIED ? (
+                <Card className="p-6 bg-green-50 border border-green-200">
+                  <h3 className="text-lg font-medium text-green-800">Application Verified</h3>
+                  <p className="mt-2 text-sm text-green-700">
+                    This application has been verified and is now awaiting KSRTC depot approval.
+                  </p>
+                </Card>
+              ) : application.status === ApplicationStatus.PAYMENT_VERIFIED ? (
+                <Card className="p-6 bg-blue-50 border border-blue-200">
+                  <h3 className="text-lg font-medium text-blue-800">Payment Verified</h3>
+                  <p className="mt-2 text-sm text-blue-700">
+                    Payment has been verified for this application. Concession pass will be issued soon.
+                  </p>
+                </Card>
+              ) : application.status === ApplicationStatus.ISSUED ? (
+                <Card className="p-6 bg-green-50 border border-green-200">
+                  <h3 className="text-lg font-medium text-green-800">Concession Pass Issued</h3>
+                  <p className="mt-2 text-sm text-green-700">
+                    The concession pass has been issued for this application.
+                  </p>
+                  <div className="mt-4">
+                    <Link href={`/student/download/${application.id}`}>
+                      <Button variant="outline" className="text-green-600 hover:bg-green-50">
+                        View Pass
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
               ) : (
                 <Card className="p-6 bg-yellow-50 border border-yellow-200">
                   <h3 className="text-lg font-medium text-yellow-800">Application Already Processed</h3>
