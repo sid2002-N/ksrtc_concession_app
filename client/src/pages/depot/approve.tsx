@@ -45,8 +45,15 @@ export default function DepotApprove() {
   // Update application status mutation
   const updateStatusMutation = useMutation({
     mutationFn: async ({ status, reason }: { status: ApplicationStatus; reason?: string }) => {
-      const res = await apiRequest("PATCH", `/api/applications/${id}/status`, { status, reason });
-      return res.json();
+      if (status === ApplicationStatus.ISSUED) {
+        // Issue concession pass
+        const res = await apiRequest("POST", `/api/applications/${id}/issue`);
+        return res.json();
+      } else {
+        // Update status
+        const res = await apiRequest("PATCH", `/api/applications/${id}/status`, { status, reason });
+        return res.json();
+      }
     },
     onSuccess: () => {
       let successTitle = "";
