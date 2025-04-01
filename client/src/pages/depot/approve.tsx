@@ -58,7 +58,7 @@ export default function DepotApprove() {
     onSuccess: () => {
       let successTitle = "";
       let successDesc = "";
-      
+
       switch (pendingAction) {
         case "approve":
           successTitle = "Application Approved";
@@ -77,12 +77,12 @@ export default function DepotApprove() {
           successDesc = "The concession pass has been issued and will be dispatched to the student.";
           break;
       }
-      
+
       toast({
         title: successTitle,
         description: successDesc,
       });
-      
+
       queryClient.invalidateQueries({ queryKey: [`/api/applications/${id}`] });
       queryClient.invalidateQueries({ queryKey: ["/api/applications"] });
       navigate("/depot/dashboard");
@@ -159,7 +159,7 @@ export default function DepotApprove() {
   // Determine which action buttons to display based on application status
   const getActionButtons = () => {
     if (!application) return null;
-    
+
     switch (application.status) {
       case ApplicationStatus.COLLEGE_VERIFIED:
         return (
@@ -204,7 +204,7 @@ export default function DepotApprove() {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-grow py-12 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="md:flex md:items-center md:justify-between mb-8">
@@ -414,7 +414,7 @@ export default function DepotApprove() {
           )}
         </div>
       </main>
-      
+
       <Footer />
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -438,7 +438,7 @@ export default function DepotApprove() {
                 : "Please confirm your action."}
             </DialogDescription>
           </DialogHeader>
-          
+
           {pendingAction === "reject" && (
             <div className="py-4">
               <Textarea
@@ -449,7 +449,7 @@ export default function DepotApprove() {
               />
             </div>
           )}
-          
+
           <DialogFooter>
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancel

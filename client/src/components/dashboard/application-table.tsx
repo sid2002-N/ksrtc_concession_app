@@ -247,15 +247,43 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                         </div>
                       )}
 
-                      {userType === "depot" && (
+                      {!readOnly && userType === "depot" && (
                         <div className="flex justify-end gap-2">
                           {application.status === ApplicationStatus.COLLEGE_VERIFIED && (
-                            <Link href={`/depot/approve/${application.id}?action=approve`}>
-                              <Button size="sm" variant="outline" className="text-blue-600 hover:text-blue-900 border-blue-200 hover:bg-blue-50">
-                                Review & Approve
+                            <>
+                              <Link href={`/depot/approve/${application.id}`}>
+                                <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
+                                  Approve
+                                </Button>
+                              </Link>
+                              <Link href={`/depot/approve/${application.id}?action=reject`}>
+                                <Button size="sm" variant="outline" className="text-red-600 hover:text-red-900 border-red-200 hover:bg-red-50">
+                                  Reject
+                                </Button>
+                              </Link>
+                            </>
+                          )}
+                          {application.status === ApplicationStatus.PAYMENT_PENDING && (
+                            <Link href={`/depot/approve/${application.id}?action=verify-payment`}>
+                              <Button size="sm" variant="outline" className="text-amber-600 hover:text-amber-900 border-amber-200 hover:bg-amber-50">
+                                Verify Payment
                               </Button>
                             </Link>
                           )}
+                          {application.status === ApplicationStatus.PAYMENT_VERIFIED && (
+                            <Link href={`/depot/approve/${application.id}?action=issue`}>
+                              <Button size="sm" variant="outline" className="text-green-600 hover:text-green-900 border-green-200 hover:bg-green-50">
+                                Issue Pass
+                              </Button>
+                            </Link>
+                          )}
+                          <Link href={`/depot/approve/${application.id}?action=view`}>
+                            <Button size="sm" variant="outline" className="text-blue-600 hover:text-blue-900 border-blue-200 hover:bg-blue-50">
+                              View Details
+                            </Button>
+                          </Link>
+                        </div>
+                      )}
                           {application.status === ApplicationStatus.PAYMENT_PENDING && (
                             <Link href={`/depot/approve/${application.id}?action=verify-payment`}>
                               <Button size="sm" variant="outline" className="text-amber-600 hover:text-amber-900 border-amber-200 hover:bg-amber-50">
