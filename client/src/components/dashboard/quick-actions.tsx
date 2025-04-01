@@ -31,7 +31,7 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
 
               {application && (
                 <Link href={`/student/track/${application.id}`}>
-                  <Button variant="outline" className="w-full animate-buttonHover"> {/* Added animation class */}
+                  <Button variant="secondary" className="w-full">
                     Track Application
                   </Button>
                 </Link>
@@ -39,14 +39,14 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
 
               {application && (
                 <Link href={`/student/download/${application.id}`}>
-                  <Button variant="outline" className="w-full animate-buttonHover"> {/* Added animation class */}
+                  <Button variant="secondary" className="w-full">
                     Download Application
                   </Button>
                 </Link>
               )}
 
               <Link href="/contact">
-                <Button variant="outline" className="w-full animate-buttonHover"> {/* Added animation class */}
+                <Button variant="secondary" className="w-full">
                   Contact Support
                 </Button>
               </Link>
@@ -56,13 +56,13 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
           {userType === "college" && (
             <>
               <Link href="/college/dashboard">
-                <Button className="w-full bg-primary-100 hover:bg-primary-200 text-primary-700 animate-buttonHover"> {/* Added animation class */}
+                <Button variant="default" className="w-full">
                   Pending Verifications
                 </Button>
               </Link>
 
               <Link href="/college/dashboard?status=college_verified">
-                <Button variant="outline" className="w-full animate-buttonHover"> {/* Added animation class */}
+                <Button variant="secondary" className="w-full">
                   Verified Applications
                 </Button>
               </Link>
@@ -84,19 +84,19 @@ export function QuickActionsCard({ application, userType }: QuickActionsProps) {
           {userType === "depot" && (
             <>
               <Link href="/depot/dashboard">
-                <Button className="w-full bg-primary-100 hover:bg-primary-200 text-primary-700 animate-buttonHover"> {/* Added animation class */}
+                <Button variant="default" className="w-full">
                   Pending Approvals
                 </Button>
               </Link>
 
               <Link href="/depot/dashboard?tab=payment">
-                <Button variant="outline" className="w-full animate-buttonHover"> {/* Added animation class */}
+                <Button variant="secondary" className="w-full">
                   Payment Verifications
                 </Button>
               </Link>
 
               <Link href="/depot/dashboard?tab=issuance">
-                <Button variant="outline" className="w-full animate-buttonHover"> {/* Added animation class */}
+                <Button variant="secondary" className="w-full">
                   Issue Concessions
                 </Button>
               </Link>
