@@ -307,8 +307,8 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                           )}
                         </div>
                       )}
-
-                      <Link href={userType === "college" ? `/college/verify/${application.id}?action=view` : `/depot/approve/${application.id}?action=view`}>
+                      <div>
+                        <Link href={userType === "college" ? `/college/verify/${application.id}?action=view` : `/depot/approve/${application.id}?action=view`}>
                         <Button size="sm" variant="ghost" className="text-primary-600 hover:text-primary-900">
                           View
                         </Button>
