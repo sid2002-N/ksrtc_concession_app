@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { PaymentDialog } from "@/components/ui/payment-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -32,6 +33,7 @@ export default function StudentPayment() {
   const { id } = useParams();
   const { toast } = useToast();
   const [, navigate] = useLocation();
+  const [showQRCode, setShowQRCode] = useState(false);
 
   // Get application details
   const { data: application, isLoading: isLoadingApplication, error: applicationError } = useQuery<Application>({
@@ -247,14 +249,19 @@ export default function StudentPayment() {
                           render={({ field }) => (
                             <FormItem>
                               <FormLabel>Payment Method</FormLabel>
-                              <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <Select onValueChange={(value) => {
+                                field.onChange(value);
+                                if (value === 'upi') {
+                                  setShowQRCode(true);
+                                }
+                              }} defaultValue={field.value}>
                                 <FormControl>
                                   <SelectTrigger>
                                     <SelectValue placeholder="Select payment method" />
                                   </SelectTrigger>
                                 </FormControl>
                                 <SelectContent>
-                                  <SelectItem value="upi">UPI</SelectItem>
+                                  <SelectItem value="upi">UPI (Recommended)</SelectItem>
                                   <SelectItem value="netbanking">Net Banking</SelectItem>
                                   <SelectItem value="debit_card">Debit Card</SelectItem>
                                   <SelectItem value="credit_card">Credit Card</SelectItem>
@@ -264,6 +271,12 @@ export default function StudentPayment() {
                               <FormMessage />
                             </FormItem>
                           )}
+                        />
+
+                        <PaymentDialog 
+                          open={showQRCode} 
+                          onClose={() => setShowQRCode(false)}
+                          amount={form.getValues("amount")}
                         />
                       </div>
 
