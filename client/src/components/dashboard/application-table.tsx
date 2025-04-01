@@ -269,7 +269,7 @@ export function ApplicationTable({ userType, applications, readOnly = false }: A
                             View
                           </Button>
                         </Link>
-                      </Link>
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
