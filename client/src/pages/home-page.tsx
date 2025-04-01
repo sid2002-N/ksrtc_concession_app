@@ -52,7 +52,8 @@ export default function HomePage() {
                     {user ? (
                       <Button 
                         onClick={redirectToDashboard}
-                        className="w-full bg-lightRed text-white hover:bg-lightRed/90 py-3 font-semibold flex items-center gap-2"
+                        variant="default"
+                        className="w-full py-3 font-semibold"
                         size="lg"
                       >
                         <Bus className="h-5 w-5" />
@@ -61,7 +62,8 @@ export default function HomePage() {
                     ) : (
                       <Link href="/auth?tab=register">
                         <Button 
-                          className="w-full bg-lightRed text-white hover:bg-lightRed/90 py-3 font-semibold flex items-center gap-2"
+                          variant="default"
+                          className="w-full py-3 font-semibold"
                           size="lg"
                         >
                           <Bus className="h-5 w-5" />
@@ -73,8 +75,9 @@ export default function HomePage() {
                   <div className="mt-3 sm:mt-0 sm:ml-3">
                     <Link href="/student/track">
                       <Button 
-                        size="lg" 
-                        className="w-full bg-lemonYellow text-darkGrey hover:bg-lemonYellow/90 py-3 border border-lemonYellow/20 font-semibold flex items-center gap-2"
+                        size="lg"
+                        variant="secondary"
+                        className="w-full py-3 font-semibold"
                       >
                         <Search className="h-5 w-5" />
                         Track Application
