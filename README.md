@@ -2,6 +2,24 @@
 
 A comprehensive web application for Kerala State Road Transport Corporation's student concession application process, enabling digital submission and tracking of transportation subsidy requests.
 
+## Screenshots
+### Home
+![Home](images/home.jpeg)
+
+### Login Pages
+![Student Login](images/Login_page.jpeg)
+![Application Form](images/students_registeration_form.jpeg)
+![Application Status](images/Student_panel.jpeg)
+
+### College Admin Portal
+![College Dashboard](images/college_admin_dashboard.jpeg)
+
+### Depot Official Portal
+![Depot Dashboard](images/ksrtc_dashboard.jpeg)
+
+
+## Project Structure
+
 ## Features
 
 - Multi-role access for students, college administrators, and depot officials
