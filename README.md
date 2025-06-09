@@ -4,7 +4,7 @@ A comprehensive web application for Kerala State Road Transport Corporation's st
 
 ## Screenshots
 ### Home
-![Home](images/home.jpeg)
+![Home](images/Home.jpeg)
 
 ### Login Pages
 ![Student Login](images/Login_page.jpeg)
