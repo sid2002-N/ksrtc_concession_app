@@ -12,7 +12,7 @@ export interface IStudent extends Document {
   course: string;
   department: string;
   semester: string;
-  collegeId: mongoose.Types.ObjectId;
+  collegeId: number;
   photoUrl: string | null;
   idCardUrl: string | null;
   addressProofUrl: string | null;
@@ -32,7 +32,7 @@ const StudentSchema = new Schema<IStudent>({
   course: { type: String, required: true },
   department: { type: String, required: true },
   semester: { type: String, required: true },
-  collegeId: { type: Schema.Types.ObjectId, ref: 'College', required: true },
+  collegeId: { type: Number, required: true },
   photoUrl: { type: String, default: null },
   idCardUrl: { type: String, default: null },
   addressProofUrl: { type: String, default: null },

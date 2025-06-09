@@ -39,7 +39,7 @@ export class MongoDBStorage implements IStorage {
   }
 
   // User operations
-  async getUser(id: number): Promise<UserType | undefined> {
+  async getUser(id: number): Promise<User | undefined> {
     try {
       const user = await UserModel.findOne({ _id: id });
       return documentToType<User, IUser>(user);
@@ -49,7 +49,7 @@ export class MongoDBStorage implements IStorage {
     }
   }
 
-  async getUserByUsername(username: string): Promise<UserType | undefined> {
+  async getUserByUsername(username: string): Promise<User | undefined> {
     try {
       const user = await UserModel.findOne({ username });
       return documentToType<User, IUser>(user);
@@ -59,34 +59,28 @@ export class MongoDBStorage implements IStorage {
     }
   }
 
-  async createUser(user: InsertUser): Promise<UserType> {
+  async createUser(user: InsertUser): Promise<User> {
     try {
       const newUser = new UserModel({
-        username: user.username,
-        password: user.password,
-        email: user.email,
-        userType: user.userType,
-        phone: user.phone,
-        collegeId: user.collegeId,
-        depotId: user.depotId,
+        ...user,
+        createdAt: new Date()
       });
-      
-      const savedUser = await newUser.save();
-      return documentToType<User, IUser>(savedUser) as User;
+      await newUser.save();
+      return documentToType<User, IUser>(newUser)!;
     } catch (error) {
       console.error('Error creating user:', error);
       throw error;
     }
   }
 
-  async updateUser(id: number, updates: Partial<UserType>): Promise<UserType | undefined> {
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
     try {
-      const updatedUser = await UserModel.findByIdAndUpdate(
-        id,
+      const user = await UserModel.findOneAndUpdate(
+        { _id: id },
         { $set: updates },
         { new: true }
       );
-      return documentToType<User, IUser>(updatedUser);
+      return documentToType<User, IUser>(user);
     } catch (error) {
       console.error('Error updating user:', error);
       return undefined;

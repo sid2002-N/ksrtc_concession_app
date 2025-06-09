@@ -238,7 +238,14 @@ export class MemStorage implements IStorage {
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = this.currentUserId++;
     const createdAt = new Date();
-    const user: User = { ...insertUser, id, createdAt };
+    const user: User = { 
+      ...insertUser, 
+      id, 
+      createdAt,
+      userType: insertUser.userType as UserType,
+      collegeId: insertUser.collegeId ?? null,
+      depotId: insertUser.depotId ?? null
+    };
     this.users.set(id, user);
     return user;
   }
@@ -265,7 +272,16 @@ export class MemStorage implements IStorage {
   
   async createStudent(insertStudent: InsertStudent): Promise<Student> {
     const id = this.currentStudentId++;
-    const student: Student = { ...insertStudent, id };
+    const student: Student = { 
+      ...insertStudent, 
+      id,
+      altPhone: insertStudent.altPhone ?? null,
+      verificationNotes: insertStudent.verificationNotes ?? null,
+      photoUrl: insertStudent.photoUrl ?? null,
+      idCardUrl: insertStudent.idCardUrl ?? null,
+      addressProofUrl: insertStudent.addressProofUrl ?? null,
+      documentsVerified: false
+    };
     this.students.set(id, student);
     return student;
   }
@@ -321,7 +337,11 @@ export class MemStorage implements IStorage {
   
   async createCollege(insertCollege: InsertCollege): Promise<College> {
     const id = this.currentCollegeId++;
-    const college: College = { ...insertCollege, id };
+    const college: College = { 
+      ...insertCollege, 
+      id,
+      userId: insertCollege.userId ?? null
+    };
     this.colleges.set(id, college);
     return college;
   }
@@ -337,7 +357,11 @@ export class MemStorage implements IStorage {
   
   async createDepot(insertDepot: InsertDepot): Promise<Depot> {
     const id = this.currentDepotId++;
-    const depot: Depot = { ...insertDepot, id };
+    const depot: Depot = { 
+      ...insertDepot, 
+      id,
+      userId: insertDepot.userId ?? null
+    };
     this.depots.set(id, depot);
     return depot;
   }
@@ -388,10 +412,13 @@ export class MemStorage implements IStorage {
       ...insertApplication, 
       id, 
       applicationDate,
+      status: ApplicationStatus.PENDING,
       collegeVerifiedAt: null,
       depotApprovedAt: null,
       paymentVerifiedAt: null,
-      issuedAt: null
+      issuedAt: null,
+      rejectionReason: null,
+      isRenewal: insertApplication.isRenewal ?? false
     };
     this.applications.set(id, application);
     return application;
@@ -446,10 +473,10 @@ export enum StorageType {
   MONGODB = 'mongodb'
 }
 
-// Storage factory
-let storageInstance: IStorage;
+// Initialize storage instance with default memory storage
+let storageInstance: IStorage = new MemStorage();
 
-export async function initializeStorage(type: StorageType): Promise<void> {
+export function initializeStorage(type: StorageType): void {
   switch (type) {
     case StorageType.MONGODB:
       storageInstance = new MongoDBStorage();
@@ -462,4 +489,38 @@ export async function initializeStorage(type: StorageType): Promise<void> {
 }
 
 // Export the storage instance
-export const storage: IStorage = new MemStorage(); // Default to memory storage
+export const storage: IStorage = {
+  // Initialize with the default storage instance
+  getUser: async (id) => storageInstance.getUser(id),
+  getUserByUsername: async (username) => storageInstance.getUserByUsername(username),
+  createUser: async (user) => storageInstance.createUser(user),
+  updateUser: async (id, updates) => storageInstance.updateUser(id, updates),
+  getStudent: async (id) => storageInstance.getStudent(id),
+  getStudentByUserId: async (userId) => storageInstance.getStudentByUserId(userId),
+  createStudent: async (student) => storageInstance.createStudent(student),
+  updateStudentDocument: async (studentId, documentType, documentUrl) => 
+    storageInstance.updateStudentDocument(studentId, documentType, documentUrl),
+  verifyStudentDocuments: async (studentId, verified, notes) => 
+    storageInstance.verifyStudentDocuments(studentId, verified, notes),
+  getCollege: async (id) => storageInstance.getCollege(id),
+  getAllColleges: async () => storageInstance.getAllColleges(),
+  createCollege: async (college) => storageInstance.createCollege(college),
+  getDepot: async (id) => storageInstance.getDepot(id),
+  getAllDepots: async () => storageInstance.getAllDepots(),
+  createDepot: async (depot) => storageInstance.createDepot(depot),
+  getApplication: async (id) => storageInstance.getApplication(id),
+  getApplicationsByStudentId: async (studentId) => storageInstance.getApplicationsByStudentId(studentId),
+  getApplicationsByCollegeId: async (collegeId, status) => storageInstance.getApplicationsByCollegeId(collegeId, status),
+  getApplicationsByDepotId: async (depotId, status) => storageInstance.getApplicationsByDepotId(depotId, status),
+  getAllApplications: async () => storageInstance.getAllApplications(),
+  createApplication: async (application) => storageInstance.createApplication(application),
+  updateApplicationStatus: async (id, status, reason) => storageInstance.updateApplicationStatus(id, status, reason),
+  updateApplicationPayment: async (id, paymentDetails) => storageInstance.updateApplicationPayment(id, paymentDetails),
+  sessionStore: storageInstance.sessionStore
+};
+
+// Initialize storage immediately
+initializeStorage(process.env.USE_MONGODB === 'true' ? StorageType.MONGODB : StorageType.MEMORY);
+
+// Replace the storage object with the initialized instance
+Object.assign(storage, storageInstance);

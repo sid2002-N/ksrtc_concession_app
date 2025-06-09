@@ -7,8 +7,8 @@ export interface IUser extends Document {
   email: string;
   userType: UserType;
   phone: string;
-  collegeId: mongoose.Types.ObjectId | null;
-  depotId: mongoose.Types.ObjectId | null;
+  collegeId: number | null;
+  depotId: number | null;
   createdAt: Date;
 }
 
@@ -22,8 +22,8 @@ const UserSchema = new Schema<IUser>({
     enum: [UserType.STUDENT, UserType.COLLEGE, UserType.DEPOT]
   },
   phone: { type: String, required: true },
-  collegeId: { type: Schema.Types.ObjectId, ref: 'College', default: null },
-  depotId: { type: Schema.Types.ObjectId, ref: 'Depot', default: null },
+  collegeId: { type: Number, default: null },
+  depotId: { type: Number, default: null },
   createdAt: { type: Date, default: Date.now }
 });
 

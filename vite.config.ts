@@ -22,6 +22,16 @@ export default defineConfig({
         ]
       : []),
   ],
+
+  server: { // Add or modify the server section
+    port: 5173, // You can keep this or let Vite choose
+    proxy: {
+  '/api': {
+    target: 'http://127.0.0.1:5000', // Use IPv4 address instead of localhost
+    changeOrigin: true,
+  }
+}
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "client", "src"),
